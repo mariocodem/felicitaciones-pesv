@@ -551,26 +551,66 @@
     .gown { width: auto; height: min(38vh, 64vw); overflow: visible; }
     .gown .halo { opacity: 0; }
     .gown .person, .gown .toga, .gown .stole, .gown .cap, .gown .roll { opacity: 0; transform-box: fill-box; }
+    .gown .breathe, .gown .sleeve, .gown .folds, .gown .sheen, .gown .fringe { transform-box: fill-box; }
     .scene.active .gown .halo { animation: fadeIn 1.4s .1s forwards; }
-    .scene.active .gown .person { animation: fadeUp 1s .2s cubic-bezier(.2,.7,.2,1) forwards; }
-    .scene.active .gown .toga { transform-origin: 50% 0; animation: unfurl 1.3s .8s cubic-bezier(.3,.8,.3,1) forwards; }
-    .scene.active .gown .stole { transform-origin: 50% 0; animation: drape 1s 2.2s cubic-bezier(.3,1.4,.5,1) forwards; }
-    .scene.active .gown .cap { transform-origin: 50% 100%; animation: capOn 1s 3.3s cubic-bezier(.3,.8,.4,1) forwards; }
-    .scene.active .gown .roll { animation: fadeUp 1s 4.6s cubic-bezier(.2,.7,.2,1) forwards; }
+    /* entra, y asiente cuando el birrete se posa */
+    .scene.active .gown .person { animation: fadeUp 1s .2s cubic-bezier(.2,.7,.2,1) forwards, nod .7s 4.35s ease-in-out; }
+    /* la toga cae como tela y se asienta */
+    .scene.active .gown .toga { transform-origin: 50% 0; animation: cloth 1.8s .8s cubic-bezier(.25,.8,.3,1) forwards; }
+    /* la estola cae, oscila como péndulo y queda meciéndose */
+    .scene.active .gown .stole { transform-origin: 50% 0; animation: drape 1.9s 2.3s cubic-bezier(.3,.7,.4,1) forwards, stoleSway 5s 4.2s ease-in-out infinite; }
+    /* el birrete baja en arco, toca la cabeza y se acomoda */
+    .scene.active .gown .cap { transform-origin: 50% 100%; animation: capDrop 1.05s 3.3s cubic-bezier(.4,.05,.6,1) forwards, capSettle .7s 4.35s ease-out forwards; }
+    .scene.active .gown .roll { transform-origin: 50% 100%; animation: lift 1.2s 5.1s cubic-bezier(.2,.8,.3,1.15) forwards; }
+    /* movimiento continuo: respiración, mangas, pliegues y brillo del satén */
+    .scene.active .gown .breathe { transform-origin: 50% 100%; animation: breathe 4.6s 2s ease-in-out infinite; }
+    .gown .sleeve { transform-origin: 50% 0; }
+    .scene.active .gown .sleeve.l { animation: sleeveSway 5.5s 2.6s ease-in-out infinite; }
+    .scene.active .gown .sleeve.r { animation: sleeveSway 5.5s 3.4s ease-in-out infinite reverse; }
+    .scene.active .gown .folds { animation: ripple 6s 2.6s ease-in-out infinite; }
+    .scene.active .gown .sheen { animation: sheen 3.8s 3.4s ease-in-out infinite; }
+    .scene.active .gown .fringe { transform-origin: 50% 0; animation: fringe 1.2s 3.2s ease-in-out 3; }
     .gown .swing { transform-box: view-box; transform-origin: 262px 95px; }
-    .scene.active .gown .swing { animation: swing 2.6s 4.2s ease-in-out, sway 4s 6.8s ease-in-out infinite; }
     @keyframes fadeIn { to { opacity: 1; } }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
-    @keyframes unfurl { from { opacity: 0; transform: scaleY(.2); } 40% { opacity: 1; } to { opacity: 1; transform: none; } }
-    @keyframes drape { from { opacity: 0; transform: translateY(-55px); } 30% { opacity: 1; } to { opacity: 1; transform: none; } }
-    @keyframes capOn {
-      0% { opacity: 0; transform: translateY(-230px) rotate(-22deg); }
-      55% { opacity: 1; transform: translateY(8px) rotate(4deg); }
-      75% { transform: translateY(-6px) rotate(-2deg); }
+    @keyframes nod { 0%, 100% { translate: 0 0; } 35% { translate: 0 3px; } 65% { translate: 0 -1px; } }
+    @keyframes cloth {
+      0% { opacity: 0; transform: scaleY(.15) skewX(0); }
+      30% { opacity: 1; }
+      48% { transform: scaleY(1.05) skewX(1.6deg); }
+      64% { transform: scaleY(.975) skewX(-1.1deg); }
+      80% { transform: scaleY(1.012) skewX(.5deg); }
       100% { opacity: 1; transform: none; }
     }
-    @keyframes swing { 0% { rotate: 0deg; } 15% { rotate: 22deg; } 35% { rotate: -14deg; } 55% { rotate: 8deg; } 75% { rotate: -4deg; } 100% { rotate: 0deg; } }
-    @keyframes sway { 0%, 100% { rotate: -3deg; } 50% { rotate: 3deg; } }
+    @keyframes drape {
+      0% { opacity: 0; transform: translateY(-80px) rotate(0); }
+      25% { opacity: 1; transform: translateY(5px) rotate(0); }
+      38% { transform: translateY(-2px) rotate(3.5deg); }
+      54% { transform: translateY(0) rotate(-2.4deg); }
+      70% { transform: rotate(1.4deg); }
+      85% { transform: rotate(-.6deg); }
+      100% { opacity: 1; transform: none; }
+    }
+    @keyframes stoleSway { 0%, 100% { rotate: -.5deg; } 50% { rotate: .6deg; } }
+    @keyframes capDrop {
+      0% { opacity: 0; transform: translate(-70px, -250px) rotate(-28deg); }
+      25% { opacity: 1; }
+      70% { transform: translate(-8px, -30px) rotate(-6deg); }
+      100% { opacity: 1; transform: none; }
+    }
+    @keyframes capSettle {
+      0% { opacity: 1; transform: none; }
+      25% { transform: translateY(3px) rotate(1.8deg) scaleY(.985); }
+      50% { transform: translateY(-2px) rotate(-1.2deg); }
+      75% { transform: translateY(1px) rotate(.4deg); }
+      100% { opacity: 1; transform: none; }
+    }
+    @keyframes lift { from { opacity: 0; transform: translateY(40px) rotate(-4deg); } to { opacity: 1; transform: none; } }
+    @keyframes breathe { 0%, 100% { transform: none; } 50% { transform: scaleY(1.007) translateY(-1px); } }
+    @keyframes sleeveSway { 0%, 100% { rotate: -.8deg; } 50% { rotate: .9deg; } }
+    @keyframes ripple { 0%, 100% { transform: none; } 50% { transform: translateX(3px) skewX(-.8deg); } }
+    @keyframes sheen { 0% { transform: translateX(-60px); } 60%, 100% { transform: translateX(140px); } }
+    @keyframes fringe { 0%, 100% { transform: none; } 30% { transform: skewX(6deg); } 65% { transform: skewX(-4deg); } }
 
     @media (max-height: 700px) and (max-aspect-ratio: 5/4) {
       .gown { height: min(30vh, 64vw); }
@@ -739,30 +779,37 @@
             <radialGradient id="halo" cx="50%" cy="35%" r="60%">
               <stop offset="0" stop-color="#f3dc9b" stop-opacity=".38"/><stop offset=".55" stop-color="#f3dc9b" stop-opacity=".08"/><stop offset="1" stop-color="#f3dc9b" stop-opacity="0"/>
             </radialGradient>
-            <!-- tela negra de la toga, iluminada desde arriba a la izquierda -->
             <linearGradient id="togaG" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0" stop-color="#262b38"/><stop offset=".35" stop-color="#151925"/><stop offset=".7" stop-color="#0b0d14"/><stop offset="1" stop-color="#040508"/>
+              <stop offset="0" stop-color="#2a2f3d"/><stop offset=".35" stop-color="#171b27"/><stop offset=".7" stop-color="#0b0d14"/><stop offset="1" stop-color="#040508"/>
             </linearGradient>
             <linearGradient id="togaShade" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/>
             </linearGradient>
             <linearGradient id="sleeveG" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0" stop-color="#1e2230"/><stop offset=".5" stop-color="#0f121b"/><stop offset="1" stop-color="#06070b"/>
+              <stop offset="0" stop-color="#232838"/><stop offset=".5" stop-color="#10131c"/><stop offset="1" stop-color="#06070b"/>
             </linearGradient>
-            <!-- satén de la estola -->
             <linearGradient id="stoleG" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0" stop-color="#4a0a17"/><stop offset=".3" stop-color="#9e2139"/><stop offset=".5" stop-color="#c4435a"/><stop offset=".7" stop-color="#861a2f"/><stop offset="1" stop-color="#3f0813"/>
             </linearGradient>
             <linearGradient id="stoleFade" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".35"/>
             </linearGradient>
+            <linearGradient id="sheenG" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#ffe6ea" stop-opacity=".45"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+            </linearGradient>
             <linearGradient id="goldG" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0" stop-color="#f7e3a8"/><stop offset=".5" stop-color="#d4ae5a"/><stop offset="1" stop-color="#8a6a26"/>
             </linearGradient>
-            <!-- piel a contraluz -->
-            <radialGradient id="skinG" cx="42%" cy="38%" r="70%">
-              <stop offset="0" stop-color="#5a4239"/><stop offset=".6" stop-color="#34251f"/><stop offset="1" stop-color="#1c1411"/>
+            <!-- piel clara con luz desde arriba a la izquierda -->
+            <radialGradient id="skinG" cx="42%" cy="36%" r="72%">
+              <stop offset="0" stop-color="#f8dcc6"/><stop offset=".55" stop-color="#ecc2a4"/><stop offset="1" stop-color="#c8937a"/>
             </radialGradient>
+            <linearGradient id="neckG" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#b98068"/><stop offset=".35" stop-color="#e2b497"/><stop offset="1" stop-color="#e8bea2"/>
+            </linearGradient>
+            <linearGradient id="hairG" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#6b4a33"/><stop offset="1" stop-color="#2f1f15"/>
+            </linearGradient>
             <linearGradient id="capTop" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0" stop-color="#3a3f4d"/><stop offset=".45" stop-color="#1a1d26"/><stop offset="1" stop-color="#07080c"/>
             </linearGradient>
@@ -772,76 +819,96 @@
             <linearGradient id="paperG" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" stop-color="#fbf5e6"/><stop offset=".5" stop-color="#e9dcbc"/><stop offset="1" stop-color="#b9a67a"/>
             </linearGradient>
+            <clipPath id="stoleClip">
+              <path d="M162 232 L186 238 L180 418 L154 418 Z"/><path d="M238 232 L214 238 L220 418 L246 418 Z"/>
+            </clipPath>
           </defs>
 
           <ellipse class="halo" cx="200" cy="210" rx="200" ry="260" fill="url(#halo)"/>
 
-          <!-- cabeza, cuello y camisa -->
+          <g class="breathe">
+          <!-- cabeza, cuello y rostro -->
           <g class="person">
-            <path d="M181 188 L181 228 Q200 240 219 228 L219 188 Z" fill="url(#skinG)"/>
-            <ellipse cx="155" cy="160" rx="7" ry="13" fill="#2a1e1a"/>
-            <ellipse cx="245" cy="160" rx="7" ry="13" fill="#221815"/>
-            <path d="M200 96 C226 96 244 116 244 150 C244 184 226 208 200 208 C174 208 156 184 156 150 C156 116 174 96 200 96 Z" fill="url(#skinG)"/>
-            <path d="M166 118 C157 134 155 168 170 190" fill="none" stroke="#f3dc9b" stroke-opacity=".5" stroke-width="2" stroke-linecap="round"/>
-            <path d="M234 118 C243 134 245 168 230 190" fill="none" stroke="#f3dc9b" stroke-opacity=".3" stroke-width="2" stroke-linecap="round"/>
-            <!-- cabello corto en las sienes -->
-            <path d="M157 140 C156 118 166 104 182 100 L176 124 C168 128 162 134 160 150 Z" fill="#110c0b"/>
-            <path d="M243 140 C244 118 234 104 218 100 L224 124 C232 128 238 134 240 150 Z" fill="#0d0908"/>
+            <path d="M180 186 L180 230 Q200 240 220 230 L220 186 Z" fill="url(#neckG)"/>
+            <ellipse cx="156" cy="158" rx="7" ry="13" fill="#e3b195"/>
+            <ellipse cx="157" cy="158" rx="3" ry="7" fill="#c98f76"/>
+            <ellipse cx="244" cy="158" rx="7" ry="13" fill="#d9a488"/>
+            <ellipse cx="243" cy="158" rx="3" ry="7" fill="#bd8469"/>
+            <path d="M200 96 C226 96 244 116 244 150 C244 180 230 204 200 210 C170 204 156 180 156 150 C156 116 174 96 200 96 Z" fill="url(#skinG)"/>
+            <!-- cabello castaño -->
+            <path d="M156 146 C154 118 166 100 186 96 L200 95 L214 96 C234 100 246 118 244 146 C240 132 234 124 226 120 L174 120 C166 124 160 132 156 146 Z" fill="url(#hairG)"/>
+            <path d="M156 146 C156 158 158 166 160 172 L162 150 Z M244 146 C244 158 242 166 240 172 L238 150 Z" fill="#3d2a1d"/>
+            <!-- rostro -->
+            <g fill="none" stroke-linecap="round">
+              <path d="M170 139 Q180 133 191 137" stroke="#5a3d2a" stroke-width="3.2"/>
+              <path d="M209 137 Q220 133 230 139" stroke="#5a3d2a" stroke-width="3.2"/>
+            </g>
+            <g class="eyes">
+              <path d="M174 151 Q181 145 189 151 Q181 155 174 151 Z" fill="#fff"/>
+              <path d="M211 151 Q219 145 226 151 Q219 155 211 151 Z" fill="#fff"/>
+              <circle cx="181.5" cy="150.5" r="3.4" fill="#4a3322"/><circle cx="218.5" cy="150.5" r="3.4" fill="#4a3322"/>
+              <circle cx="182.5" cy="149.5" r="1" fill="#fff"/><circle cx="219.5" cy="149.5" r="1" fill="#fff"/>
+              <path d="M174 151 Q181 145 189 151 M211 151 Q219 145 226 151" fill="none" stroke="#3b281c" stroke-width="1.4"/>
+            </g>
+            <path d="M201 152 Q199 166 193 173 Q199 178 207 174" fill="none" stroke="#c08568" stroke-width="2" stroke-linecap="round"/>
+            <ellipse cx="173" cy="172" rx="10" ry="6" fill="#e89a8a" opacity=".22"/>
+            <ellipse cx="227" cy="172" rx="10" ry="6" fill="#e89a8a" opacity=".22"/>
+            <path d="M186 187 Q200 196 214 187" fill="none" stroke="#a9584b" stroke-width="2.6" stroke-linecap="round"/>
+            <path d="M190 190 Q200 195 210 190" fill="none" stroke="#c9786a" stroke-width="1.2" stroke-linecap="round" opacity=".6"/>
+            <path d="M166 118 C157 134 155 168 170 190" fill="none" stroke="#fff4dc" stroke-opacity=".35" stroke-width="2" stroke-linecap="round"/>
           </g>
 
           <!-- toga -->
           <g class="toga">
             <path d="M200 232 C168 232 134 238 110 252 C86 266 74 292 68 332 C62 382 58 432 52 500 L348 500 C342 432 338 382 332 332 C326 292 314 266 290 252 C266 238 232 232 200 232 Z" fill="url(#togaG)"/>
             <path d="M200 232 C168 232 134 238 110 252 C86 266 74 292 68 332 C62 382 58 432 52 500 L348 500 C342 432 338 382 332 332 C326 292 314 266 290 252 C266 238 232 232 200 232 Z" fill="url(#togaShade)"/>
-            <!-- escote en V con camisa y corbata -->
             <path d="M172 234 L200 282 L228 234 Z" fill="#eef0f5"/>
             <path d="M184 234 L200 262 L216 234 L208 232 L200 248 L192 232 Z" fill="#c9ccd6"/>
             <path d="M195 250 L205 250 L208 270 L200 281 L192 270 Z" fill="#13244a"/>
             <path d="M196 244 L204 244 L205 251 L195 251 Z" fill="#1c3366"/>
             <path d="M172 234 L200 282 L228 234" fill="none" stroke="#05060a" stroke-width="5" stroke-linejoin="round"/>
-            <!-- pliegues -->
-            <g fill="none" stroke-linecap="round">
-              <path d="M150 300 Q142 400 136 500" stroke="rgba(255,255,255,.05)" stroke-width="7"/>
+            <g class="folds" fill="none" stroke-linecap="round">
+              <path d="M150 300 Q142 400 136 500" stroke="rgba(255,255,255,.06)" stroke-width="7"/>
               <path d="M156 300 Q150 400 146 500" stroke="rgba(0,0,0,.45)" stroke-width="4"/>
-              <path d="M200 300 Q202 400 200 500" stroke="rgba(255,255,255,.04)" stroke-width="8"/>
+              <path d="M200 300 Q202 400 200 500" stroke="rgba(255,255,255,.05)" stroke-width="8"/>
               <path d="M206 300 Q208 400 208 500" stroke="rgba(0,0,0,.4)" stroke-width="4"/>
-              <path d="M250 300 Q258 400 264 500" stroke="rgba(255,255,255,.03)" stroke-width="7"/>
+              <path d="M250 300 Q258 400 264 500" stroke="rgba(255,255,255,.035)" stroke-width="7"/>
               <path d="M256 300 Q264 400 272 500" stroke="rgba(0,0,0,.45)" stroke-width="4"/>
             </g>
-            <!-- mangas acampanadas -->
-            <path d="M112 254 C86 282 76 340 78 396 L82 452 C104 464 136 466 160 452 L150 372 C144 320 132 280 112 254 Z" fill="url(#sleeveG)"/>
-            <path d="M288 254 C314 282 324 340 322 396 L318 452 C296 464 264 466 240 452 L250 372 C256 320 268 280 288 254 Z" fill="url(#sleeveG)"/>
-            <g fill="none" stroke-linecap="round">
-              <path d="M104 300 Q96 370 100 450" stroke="rgba(255,255,255,.06)" stroke-width="5"/>
-              <path d="M126 300 Q124 380 132 458" stroke="rgba(0,0,0,.5)" stroke-width="3"/>
-              <path d="M296 300 Q304 370 300 450" stroke="rgba(255,255,255,.03)" stroke-width="5"/>
-              <path d="M274 300 Q276 380 268 458" stroke="rgba(0,0,0,.5)" stroke-width="3"/>
+            <g class="sleeve l">
+              <path d="M112 254 C86 282 76 340 78 396 L82 452 C104 464 136 466 160 452 L150 372 C144 320 132 280 112 254 Z" fill="url(#sleeveG)"/>
+              <path d="M104 300 Q96 370 100 450" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="5" stroke-linecap="round"/>
+              <path d="M126 300 Q124 380 132 458" fill="none" stroke="rgba(0,0,0,.5)" stroke-width="3" stroke-linecap="round"/>
+              <path d="M82 452 C104 464 136 466 160 452" fill="none" stroke="#020203" stroke-width="3"/>
             </g>
-            <path d="M82 452 C104 464 136 466 160 452 M240 452 C264 466 296 464 318 452" fill="none" stroke="#020203" stroke-width="3"/>
+            <g class="sleeve r">
+              <path d="M288 254 C314 282 324 340 322 396 L318 452 C296 464 264 466 240 452 L250 372 C256 320 268 280 288 254 Z" fill="url(#sleeveG)"/>
+              <path d="M296 300 Q304 370 300 450" fill="none" stroke="rgba(255,255,255,.035)" stroke-width="5" stroke-linecap="round"/>
+              <path d="M274 300 Q276 380 268 458" fill="none" stroke="rgba(0,0,0,.5)" stroke-width="3" stroke-linecap="round"/>
+              <path d="M240 452 C264 466 296 464 318 452" fill="none" stroke="#020203" stroke-width="3"/>
+            </g>
           </g>
 
-          <!-- estola -->
+          <!-- estola de satén -->
           <g class="stole">
             <path d="M162 232 Q200 204 238 232 L228 240 Q200 222 172 240 Z" fill="url(#stoleG)"/>
             <path d="M162 232 L186 238 L180 418 L154 418 Z" fill="url(#stoleG)"/>
             <path d="M238 232 L214 238 L220 418 L246 418 Z" fill="url(#stoleG)"/>
             <path d="M162 232 L186 238 L180 418 L154 418 Z" fill="url(#stoleFade)"/>
             <path d="M238 232 L214 238 L220 418 L246 418 Z" fill="url(#stoleFade)"/>
-            <!-- ribete dorado -->
+            <g clip-path="url(#stoleClip)"><rect class="sheen" x="130" y="220" width="36" height="210" fill="url(#sheenG)"/></g>
             <g fill="none" stroke="url(#goldG)" stroke-width="1.6">
               <path d="M165 236 L159 414 M183 241 L177 414"/>
               <path d="M235 236 L241 414 M217 241 L223 414"/>
               <path d="M154 404 L180 404 M220 404 L246 404"/>
             </g>
-            <!-- emblema bordado: balanza -->
             <g stroke="url(#goldG)" stroke-width="1.4" fill="none" stroke-linecap="round">
               <path d="M170 300 L170 322 M161 305 L179 305 M161 305 L158 313 M161 305 L164 313 M179 305 L176 313 M179 305 L182 313 M165 322 L175 322"/>
               <path d="M157 313 Q161 317 165 313 M175 313 Q179 317 183 313"/>
               <path d="M230 300 L230 322 M221 305 L239 305 M221 305 L218 313 M221 305 L224 313 M239 305 L236 313 M239 305 L242 313 M225 322 L235 322"/>
               <path d="M217 313 Q221 317 225 313 M235 313 Q239 317 243 313"/>
             </g>
-            <!-- flecos -->
-            <g stroke="#e6c77a" stroke-width="1.2">
+            <g class="fringe" stroke="#e6c77a" stroke-width="1.2">
               <path d="M156 418 v12 M159 418 v14 M162 418 v12 M165 418 v14 M168 418 v12 M171 418 v14 M174 418 v12 M177 418 v14 M180 418 v12"/>
               <path d="M220 418 v12 M223 418 v14 M226 418 v12 M229 418 v14 M232 418 v12 M235 418 v14 M238 418 v12 M241 418 v14 M244 418 v12"/>
             </g>
@@ -873,17 +940,18 @@
             <path d="M200 452 L190 478 L197 474 L200 482 M200 452 L210 478 L203 474 L200 482" fill="#861a2f"/>
             <path d="M150 428 C158 424 170 426 172 436 C174 448 162 456 150 454 C140 452 138 432 150 428 Z" fill="url(#skinG)"/>
             <path d="M250 428 C242 424 230 426 228 436 C226 448 238 456 250 454 C260 452 262 432 250 428 Z" fill="url(#skinG)"/>
-            <g fill="none" stroke="#150f0d" stroke-width="1.2" stroke-linecap="round">
+            <g fill="none" stroke="#b77e66" stroke-width="1.2" stroke-linecap="round">
               <path d="M163 432 Q168 434 170 438 M161 439 Q167 441 170 445 M158 446 Q163 448 166 452"/>
               <path d="M237 432 Q232 434 230 438 M239 439 Q233 441 230 445 M242 446 Q237 448 234 452"/>
             </g>
+          </g>
           </g>
         </svg>
         <div class="copy">
           <p class="kicker anim d3">Acto de investidura</p>
           <div class="rule"></div>
-          <p class="big gold-text anim d4" style="margin:6px 0">Toga, estola y birrete</p>
-          <p class="serif-line anim d5">Símbolos del honor académico y del compromiso con la justicia y la paz.</p>
+          <p class="big gold-text anim d4" style="margin:6px 0;font-size:clamp(1.4rem, min(5vw, 7vh), 3.4rem)">El honor se viste con orgullo</p>
+          <p class="serif-line anim d5">Hoy no termina un camino: comienza la misión de construir paz.</p>
         </div>
       </div>
     </div>
@@ -1122,9 +1190,17 @@
         if (!AC) return;
         ctx = new AC();
         const comp = ctx.createDynamicsCompressor();
-        comp.threshold.value = -16; comp.ratio.value = 4;
-        master = ctx.createGain(); master.gain.value = muted ? 0 : .9;
-        master.connect(comp).connect(ctx.destination);
+        comp.threshold.value = -12; comp.ratio.value = 6; comp.attack.value = .004; comp.release.value = .2;
+        master = ctx.createGain(); master.gain.value = muted ? 0 : 1;
+        // limitador + saturación suave: suena fuerte sin distorsionar los parlantes
+        const trim = ctx.createGain(); trim.gain.value = .6;
+        const limiter = ctx.createDynamicsCompressor();
+        limiter.threshold.value = -6; limiter.knee.value = 0; limiter.ratio.value = 20;
+        limiter.attack.value = .001; limiter.release.value = .12;
+        const clip = ctx.createWaveShaper(), curve = new Float32Array(2048);
+        for (let i = 0; i < curve.length; i++) { const x = i / 1023.5 - 1; curve[i] = Math.tanh(1.3 * x) / Math.tanh(1.3); }
+        clip.curve = curve; clip.oversample = "2x";
+        master.connect(comp).connect(trim).connect(limiter).connect(clip).connect(ctx.destination);
         // reverberación de "salón de ceremonias"
         const verb = ctx.createConvolver();
         const len = ctx.sampleRate * 3.5, ir = ctx.createBuffer(2, len, ctx.sampleRate);
@@ -1155,7 +1231,7 @@
       function pause(p) { if (ctx) p ? ctx.suspend() : ctx.resume(); }
       function toggleMute() {
         muted = !muted;
-        if (master) master.gain.setTargetAtTime(muted ? 0 : .9, ctx.currentTime, .05);
+        if (master) master.gain.setTargetAtTime(muted ? 0 : 1, ctx.currentTime, .05);
         return muted;
       }
 
@@ -1230,44 +1306,132 @@
       const phrase = (t, notes, v) => notes.forEach(([m, at, d]) => brass(m, t + at, d, v));
       const chords = (t, list, v) => list.forEach(([ms, at, d]) => ms.forEach(m => brass(m, t + at, d, v)));
 
+      // ---------- percusión y cuerdas para la banda sonora épica ----------
+      function kick(t, v = .9) {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.frequency.setValueAtTime(160, t); o.frequency.exponentialRampToValueAtTime(42, t + .12);
+        g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.001, t + .45);
+        o.connect(g).connect(bus); o.start(t); o.stop(t + .5);
+      }
+      function snare(t, v = .35) {
+        const n = noiseSrc(), g = ctx.createGain();
+        g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.001, t + .2);
+        n.connect(filter("bandpass", 2200, .6)).connect(g).connect(bus); n.start(t); n.stop(t + .22);
+        const o = ctx.createOscillator(), og = ctx.createGain();
+        o.type = "triangle"; o.frequency.setValueAtTime(220, t); o.frequency.exponentialRampToValueAtTime(160, t + .08);
+        og.gain.setValueAtTime(v * .6, t); og.gain.exponentialRampToValueAtTime(.001, t + .12);
+        o.connect(og).connect(bus); o.start(t); o.stop(t + .14);
+      }
+      function hat(t, v = .06) {
+        const n = noiseSrc(), g = ctx.createGain();
+        g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.001, t + .05);
+        n.connect(filter("highpass", 7500)).connect(g).connect(bus); n.start(t); n.stop(t + .06);
+      }
+      const taiko = (t, v = .8) => { timp(31, t, v, 1.1); kick(t, v * .7); };
+      function string(m, t, d = .2, v = .035) {
+        const f = mtof(m), g = ctx.createGain(), lp = filter("lowpass", 3200, .7);
+        g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + .008);
+        g.gain.exponentialRampToValueAtTime(.001, t + d);
+        lp.connect(g).connect(bus);
+        [-8, 8].forEach(dt => {
+          const o = ctx.createOscillator(); o.type = "sawtooth"; o.frequency.value = f; o.detune.value = dt;
+          o.connect(lp); o.start(t); o.stop(t + d + .05);
+        });
+      }
+      function bass(m, t, d, v = .14) {
+        const f = mtof(m), g = ctx.createGain(), lp = filter("lowpass", 420, 1.5);
+        g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + .01);
+        g.gain.setTargetAtTime(v * .6, t + .05, .2); g.gain.setTargetAtTime(0, t + d, .06);
+        lp.connect(g).connect(bus);
+        [["sawtooth", f], ["sine", f / 2]].forEach(([type, fr]) => {
+          const o = ctx.createOscillator(); o.type = type; o.frequency.value = fr;
+          o.connect(lp); o.start(t); o.stop(t + d + .4);
+        });
+      }
+
+      // progresión heroica (vi–IV–I–V) a 120 bpm: 1 compás = 2 s
+      const BAR = 2, E8 = .25;
+      const PROG = [
+        { c: [57, 60, 64], b: 33 }, { c: [57, 60, 65], b: 29 },
+        { c: [55, 60, 64], b: 36 }, { c: [55, 59, 62], b: 31 }
+      ];
+      const ARP = [0, 1, 2, 1, 2, 1, 0, 1];
+      // toca compases desde t durante "dur" segundos con las capas pedidas
+      function groove(t, dur, o = {}) {
+        const end = t + dur, first = o.from || 0;
+        for (let k = 0; t + k * BAR < end; k++) {
+          const bt = t + k * BAR, ch = PROG[(k + first) % 4];
+          for (let s = 0; s < 8; s++) {
+            const st = bt + s * E8;
+            if (st >= end) break;
+            if (o.strings) string(ch.c[ARP[s]] + 12, st, .2, o.strings);
+            if (o.low) string(ch.c[ARP[(s + 3) % 8]], st, .18, o.low);
+            if (o.hats) hat(st, s % 2 ? o.hats * .6 : o.hats);
+            if (o.kick && (s % 4 === 0 || (o.four && s % 2 === 0))) kick(st, o.kick);
+            if (o.kick && o.drive && s === 7) kick(st, o.kick * .7);
+            if (o.snare && (s === 2 || s === 6)) snare(st, o.snare);
+          }
+          if (o.bass) [0, 3, 4, 6].forEach(s => bt + s * E8 < end && bass(ch.b + 12, bt + s * E8, s === 0 ? .7 : .2, o.bass));
+          if (o.pad) pad(ch.c.map(m => m - 12), bt, Math.min(BAR, end - bt), o.pad);
+          if (o.stab && bt < end) chords(bt, [[ch.c, 0, .35]], o.stab);
+          if (o.crash && k % 2 === 0) cymbal(bt, o.crash);
+          if (o.taiko) taiko(bt, o.taiko);
+        }
+      }
+      function snareRoll(t, d, v = .4) {
+        for (let x = 0; x < d; x += .06 - .03 * (x / d)) snare(t + x, .05 + v * (x / d) ** 1.6);
+      }
+      // melodía heroica de metales sobre la progresión
+      const HERO = [[76, 0, .75], [74, .75, .25], [72, 1, 1], [72, 2, .5], [69, 2.5, .5], [72, 3, 1], [79, 4, 1.5], [76, 5.5, .5], [74, 6, .75], [72, 6.75, .25], [74, 7, 1]];
+
       const cues = {
         open(t) {
-          roll(36, t, 1.4); timp(36, t + 1.45, .9); cymbal(t + 1.45, .2);
-          phrase(t + 1.45, [[67, 0, .14], [67, .17, .14], [67, .34, .14], [72, .51, 1.4]], .12);
-          chords(t + 1.96, [[[48, 60, 64], 0, 1.4]], .07);
-          chime(84, t + 2.3); chime(88, t + 2.45); chime(91, t + 2.6);
-          pad([48, 52, 55, 60], t + 2.8, 4.6);
+          roll(36, t, 1.4); swell(t, 1.4, .1);
+          taiko(t + 1.45, 1); cymbal(t + 1.45, .35);
+          phrase(t + 1.45, [[67, 0, .14], [67, .17, .14], [67, .34, .14], [72, .51, 1.4]], .15);
+          chords(t + 1.96, [[[48, 60, 64, 67], 0, 1.4]], .08);
+          taiko(t + 1.96, .7);
+          groove(t + 3.5, 4, { strings: .03, bass: .1, kick: .6, pad: .03 });
         },
         reflect(t) {
-          pad([45, 52, 57, 60], t, 5.4);
+          groove(t, 5.6, { strings: .04, low: .018, bass: .12, kick: .75, hats: .05, pad: .035 });
           chime(76, t + .1); chime(81, t + .6); chime(84, t + 1.2);
         },
         build(t) {
-          pad([41, 48, 53, 57], t, 3.1); pad([43, 50, 55, 59], t + 3.1, 3.3);
-          [[72, 0], [76, .5], [79, 1.1], [84, 1.8]].forEach(([m, at]) => { chime(m, t + at); timp(43, t + at, .25); });
+          groove(t, 6.4, { from: 2, strings: .045, low: .022, bass: .13, kick: .85, four: true, snare: .28, hats: .07, pad: .04, stab: .05 });
+          [0, .5, 1.1, 1.8].forEach(at => taiko(t + at, .7));
+          swell(t + 4.4, 2, .1);
         },
         roll(t) {
-          roll(36, t, 3.7); swell(t, 3.7); pad([43, 50, 55, 60, 62], t, 3.7, .035);
+          snareRoll(t, 3.6, .45); swell(t, 3.7, .16);
+          [0, 1, 1.75, 2.25, 2.6, 2.9, 3.1, 3.3, 3.45, 3.6].forEach((at, k) => taiko(t + at, .45 + k * .05));
+          chords(t, [[[55, 59, 62, 67], 0, 3.7]], .04);
+          pad([43, 50, 55, 62], t, 3.7, .04);
         },
         reveal(t) {
-          timp(36, t, .95); timp(31, t, .7); cymbal(t, .4);
-          phrase(t, [[72, 0, .5], [67, .5, .16], [72, .66, .16], [76, .82, .6], [74, 1.42, .2], [76, 1.62, .2], [79, 1.82, 2.4]], .13);
+          taiko(t, 1); kick(t, 1); timp(24, t, .8, 2.2); cymbal(t, .5);
+          phrase(t, [[72, 0, .5], [67, .5, .16], [72, .66, .16], [76, .82, .6], [74, 1.42, .2], [76, 1.62, .2], [79, 1.82, 2.4]], .15);
           chords(t, [
             [[48, 55, 60, 64], 0, .82], [[52, 55, 60, 64], .82, .6],
             [[43, 55, 59, 62], 1.42, .4], [[48, 55, 60, 64, 67], 1.82, 2.4]
-          ], .06);
-          timp(36, t + 1.82, .8); cymbal(t + 1.82, .35);
+          ], .07);
+          taiko(t + 1.82, 1); cymbal(t + 1.82, .45);
           [84, 88, 91, 96, 91, 96, 100].forEach((m, k) => chime(m, t + 2.4 + k * .09, .06));
-          pad([48, 55, 60, 64], t + 2.2, 6);
+          groove(t + 1.82, 7, { from: 2, strings: .05, low: .025, bass: .15, kick: 1, four: true, drive: true, snare: .34, hats: .08, pad: .045, crash: .3, stab: .045 });
+          phrase(t + 3.82, HERO.slice(0, 7), .12);
         },
         invest(t) {
-          pad([41, 48, 53, 57], t, 3.6); pad([48, 52, 55, 60], t + 3.6, 4.8);
+          groove(t, 8.6, { strings: .045, low: .022, bass: .14, kick: .95, four: true, drive: true, snare: .32, hats: .075, pad: .045, crash: .25 });
+          phrase(t + .4, HERO, .12);
           [60, 64, 67, 72, 76, 79].forEach((m, k) => chime(m, t + .8 + k * .12, .05)); // toga
-          chime(84, t + 2.6, .07); chime(88, t + 2.75, .06);                         // estola
-          swell(t + 2.9, .9, .06);                                                   // birrete bajando
-          chime(79, t + 4.9, .05); chime(84, t + 5.05, .05); chime(91, t + 5.2, .04); // diploma
+          chime(84, t + 2.9, .07); chime(88, t + 3.05, .06);                         // estola
+          swell(t + 3.3, 1, .08);                                                    // birrete bajando
+          chime(79, t + 5.4, .05); chime(84, t + 5.55, .05); chime(91, t + 5.7, .04); // diploma
         },
-        seal(t) { pad([41, 48, 53, 57, 60], t, 1.4, .035); swell(t + .2, 1.1, .08); }
+        seal(t) {
+          groove(t, 1.3, { from: 3, strings: .045, bass: .13, kick: .9, four: true, hats: .08 });
+          snareRoll(t + .2, 1.1, .45); swell(t + .2, 1.1, .12);
+        }
       };
       function cue(name) {
         if (!bus || !cues[name]) return;
@@ -1277,9 +1441,12 @@
       function impact() {
         if (!bus) return;
         const t = ctx.currentTime + .01;
-        timp(36, t, 1); timp(24, t, .8, 2.2); cymbal(t, .3);
-        chords(t, [[[48, 55, 60, 64, 67], 0, 3.4]], .06); brass(72, t, 3.4, .1);
-        pad([36, 48, 55, 64], t, 5, .05);
+        taiko(t, 1.1); kick(t, 1); timp(24, t, .9, 2.4); cymbal(t, .55);
+        chords(t, [[[48, 55, 60, 64, 67], 0, 3.6]], .075); brass(72, t, 3.6, .13); brass(76, t, 3.6, .1);
+        pad([36, 48, 55, 64], t, 5, .06);
+        // cierre: dos compases más con todo y golpe final
+        groove(t + .5, 4, { strings: .045, low: .02, bass: .14, kick: .9, four: true, snare: .3, hats: .07, crash: .25 });
+        taiko(t + 4.5, 1.1); cymbal(t + 4.5, .5); chords(t + 4.5, [[[48, 55, 60, 64, 72], 0, 2.5]], .08);
       }
       function pop() {
         if (!bus) return;
@@ -1480,9 +1647,34 @@
       if (s.hasAttribute("data-caps")) setTimeout(() => launchCaps(16), 2600);
     }
 
-    // cuando el birrete se posa: chispas doradas y acorde
+    // borla del birrete: péndulo amortiguado con una brisa suave
+    const tassel = film.querySelector(".gown .swing");
+    const pend = { a: 0, v: 0, last: 0, on: false };
+    function tasselTick(now) {
+      if (!pend.on) return;
+      const dt = Math.min(.05, (now - pend.last) / 1000 || 0); pend.last = now;
+      if (!paused) {
+        const breeze = Math.sin(now / 900) * 6 + Math.sin(now / 370) * 2;
+        pend.v += (-38 * pend.a - 1.6 * pend.v + breeze) * dt;
+        pend.a += pend.v * dt;
+        tassel.style.rotate = pend.a.toFixed(2) + "deg";
+      }
+      requestAnimationFrame(tasselTick);
+    }
+    function startTassel() {
+      pend.a = -12; pend.v = 0; pend.last = performance.now();   // la borla va inclinada mientras baja
+      if (!pend.on) { pend.on = true; requestAnimationFrame(tasselTick); }
+    }
+    const gownScene = film.querySelector(".gown").closest(".scene");
+    new MutationObserver(() => {
+      if (gownScene.classList.contains("active")) startTassel();
+      else if (!gownScene.classList.contains("leaving")) { pend.on = false; tassel.style.rotate = ""; }
+    }).observe(gownScene, { attributes: true, attributeFilter: ["class"] });
+
+    // cuando el birrete toca la cabeza: la borla se sacude, chispas y acorde
     film.querySelector(".gown .cap").addEventListener("animationend", e => {
-      if (e.animationName !== "capOn") return;
+      if (e.animationName !== "capDrop") return;
+      pend.v += 260;
       const r = e.target.getBoundingClientRect();
       burst(r.left + r.width / 2, r.top + r.height * .35, 50, "#f3dc9b");
       Sound.capLand();
