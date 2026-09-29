@@ -545,6 +545,45 @@
 
     .big.mid { font-size: clamp(1.05rem, min(4.4vw, 6vh), 2.6rem); }
 
+    /* ---------- Investidura: toga, estola y birrete ---------- */
+    .invest { display: grid; justify-items: center; gap: 10px; padding: 0 10px; }
+    .invest .copy { max-width: 520px; }
+    .gown { width: auto; height: min(38vh, 64vw); overflow: visible; }
+    .gown .halo { opacity: 0; }
+    .gown .person, .gown .toga, .gown .stole, .gown .cap { opacity: 0; transform-box: fill-box; }
+    .scene.active .gown .halo { animation: fadeIn 1.4s .1s forwards; }
+    .scene.active .gown .person { animation: fadeUp 1s .2s cubic-bezier(.2,.7,.2,1) forwards; }
+    .scene.active .gown .toga { transform-origin: 50% 0; animation: unfurl 1.3s .8s cubic-bezier(.3,.8,.3,1) forwards; }
+    .scene.active .gown .stole { transform-origin: 50% 0; animation: drape 1s 2.2s cubic-bezier(.3,1.4,.5,1) forwards; }
+    .scene.active .gown .cap { transform-origin: 50% 100%; animation: capOn 1s 3.3s cubic-bezier(.3,.8,.4,1) forwards; }
+    .gown .swing { transform-box: view-box; transform-origin: 206px 72px; }
+    .scene.active .gown .swing { animation: swing 2.6s 4.2s ease-in-out, sway 4s 6.8s ease-in-out infinite; }
+    @keyframes fadeIn { to { opacity: 1; } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+    @keyframes unfurl { from { opacity: 0; transform: scaleY(.2); } 40% { opacity: 1; } to { opacity: 1; transform: none; } }
+    @keyframes drape { from { opacity: 0; transform: translateY(-55px); } 30% { opacity: 1; } to { opacity: 1; transform: none; } }
+    @keyframes capOn {
+      0% { opacity: 0; transform: translateY(-230px) rotate(-22deg); }
+      55% { opacity: 1; transform: translateY(8px) rotate(4deg); }
+      75% { transform: translateY(-6px) rotate(-2deg); }
+      100% { opacity: 1; transform: none; }
+    }
+    @keyframes swing { 0% { rotate: 0deg; } 15% { rotate: 22deg; } 35% { rotate: -14deg; } 55% { rotate: 8deg; } 75% { rotate: -4deg; } 100% { rotate: 0deg; } }
+    @keyframes sway { 0%, 100% { rotate: -3deg; } 50% { rotate: 3deg; } }
+
+    @media (max-height: 700px) and (max-aspect-ratio: 5/4) {
+      .gown { height: min(30vh, 64vw); }
+      .invest { gap: 4px; }
+      .invest .rule { margin: 8px auto; }
+    }
+    .hero-cap { width: clamp(64px, 12vw, 96px); margin: 0 auto 6px; display: block; filter: drop-shadow(0 8px 18px rgba(0,0,0,.5)); }
+
+    @media (min-aspect-ratio: 5/4) {
+      .invest { grid-template-columns: auto minmax(0, min(520px, 52vw)); align-items: center; gap: 3vw; text-align: left; }
+      .invest .rule { margin-left: 0; }
+      .gown { height: min(60vh, 42vw); }
+    }
+
     /* Pantallas pequeñas y teléfonos en horizontal */
     @media (max-width: 480px) {
       .hide-sm { display: none; }
@@ -680,7 +719,7 @@
     </div>
 
     <!-- Escena 5 : revelación del nombre -->
-    <div class="scene" data-duration="8800" data-cue="reveal" data-flash data-lights data-fireworks data-confetti>
+    <div class="scene" data-duration="8800" data-cue="reveal" data-flash data-lights data-fireworks data-confetti data-caps>
       <div class="rays"></div>
       <div class="shot">
         <p class="track gold-text">¡Felicitaciones!</p>
@@ -691,7 +730,85 @@
       </div>
     </div>
 
-    <!-- Escena 6 : sello -->
+    <!-- Escena 6 : investidura -->
+    <div class="scene" data-duration="8600" data-cue="invest">
+      <div class="shot invest">
+        <svg class="gown" viewBox="0 0 300 380" aria-label="Graduado con toga, estola y birrete">
+          <defs>
+            <radialGradient id="halo" cx="50%" cy="40%" r="55%">
+              <stop offset="0" stop-color="#f3dc9b" stop-opacity=".35"/><stop offset="1" stop-color="#f3dc9b" stop-opacity="0"/>
+            </radialGradient>
+            <linearGradient id="togaG" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#1c2440"/><stop offset="1" stop-color="#05070f"/>
+            </linearGradient>
+            <linearGradient id="stoleG" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#a3223a"/><stop offset="1" stop-color="#5a0d1c"/>
+            </linearGradient>
+            <linearGradient id="headG" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#2d4270"/><stop offset="1" stop-color="#121d38"/>
+            </linearGradient>
+          </defs>
+          <ellipse class="halo" cx="150" cy="170" rx="150" ry="190" fill="url(#halo)"/>
+
+          <!-- figura -->
+          <g class="person">
+            <rect x="137" y="132" width="26" height="34" rx="8" fill="url(#headG)"/>
+            <circle cx="150" cy="108" r="36" fill="url(#headG)" stroke="rgba(243,220,155,.45)" stroke-width="1.5"/>
+          </g>
+
+          <!-- toga -->
+          <g class="toga">
+            <path d="M150 158 C120 158 95 165 75 180 C55 195 45 230 40 280 L30 380 L270 380 L260 280 C255 230 245 195 225 180 C205 165 180 158 150 158 Z" fill="url(#togaG)" stroke="rgba(243,220,155,.35)" stroke-width="1.2"/>
+            <g fill="none" stroke="rgba(255,255,255,.07)" stroke-width="2">
+              <path d="M82 200 Q70 290 62 380"/><path d="M218 200 Q230 290 238 380"/>
+              <path d="M118 232 Q112 305 106 380"/><path d="M182 232 Q188 305 194 380"/>
+            </g>
+            <path d="M132 160 L150 204 L168 160 Z" fill="#e6e9f1"/>
+            <path d="M144 170 L150 204 L156 170 L150 164 Z" fill="#13244a"/>
+          </g>
+
+          <!-- estola -->
+          <g class="stole">
+            <path d="M124 157 L146 165 L134 350 L122 372 L110 350 Z" fill="url(#stoleG)" stroke="#d4ae5a" stroke-width="1.6"/>
+            <path d="M176 157 L154 165 L166 350 L178 372 L190 350 Z" fill="url(#stoleG)" stroke="#d4ae5a" stroke-width="1.6"/>
+            <g stroke="#f3dc9b" stroke-width="1">
+              <path d="M112 356 L112 366 M116 360 L116 372 M120 364 L120 376 M124 364 L124 376 M128 360 L128 372 M132 356 L132 366"/>
+              <path d="M168 356 L168 366 M172 360 L172 372 M176 364 L176 376 M180 364 L180 376 M184 360 L184 372 M188 356 L188 366"/>
+            </g>
+            <g fill="#f3dc9b">
+              <path d="M132 206 l4 6 -4 6 -4 -6 Z"/><path d="M168 206 l4 6 -4 6 -4 -6 Z"/>
+            </g>
+            <g font-family="Cinzel, serif" font-weight="700" font-size="15" fill="#f3dc9b" text-anchor="middle">
+              <text x="130.3" y="245">P</text><text x="128.6" y="267">E</text><text x="127" y="289">S</text><text x="125.4" y="311">V</text>
+              <text data-ini x="169.7" y="245"></text><text data-ini x="171.4" y="267"></text><text data-ini x="173" y="289"></text><text data-ini x="174.6" y="311"></text>
+            </g>
+          </g>
+
+          <!-- birrete -->
+          <g class="cap">
+            <path d="M110 76 L110 98 Q150 114 190 98 L190 76 Q150 92 110 76 Z" fill="#0b0f1d" stroke="rgba(243,220,155,.5)" stroke-width="1"/>
+            <polygon points="68,60 150,82 232,60 232,66 150,88 68,66" fill="#05070f"/>
+            <polygon points="150,38 232,60 150,82 68,60" fill="#1a2238" stroke="#d4ae5a" stroke-width="1.2"/>
+            <path d="M150 60 L206 72" stroke="#f3dc9b" stroke-width="2" fill="none"/>
+            <circle cx="150" cy="60" r="3.5" fill="#f3dc9b"/>
+            <g class="swing">
+              <path d="M206 72 L207 120" stroke="#f3dc9b" stroke-width="2"/>
+              <path d="M201 118 L213 118 L217 146 L197 146 Z" fill="#d4ae5a"/>
+              <path d="M201 124 L199 146 M205 124 L204 146 M209 124 L210 146 M213 124 L215 146" stroke="#9c7a2e" stroke-width="1"/>
+              <rect x="200" y="114" width="14" height="6" rx="2" fill="#f3dc9b"/>
+            </g>
+          </g>
+        </svg>
+        <div class="copy">
+          <p class="kicker anim d3">La investidura</p>
+          <div class="rule"></div>
+          <p class="big gold-text anim d4" style="margin:6px 0">Toga, estola y birrete</p>
+          <p class="serif-line anim d5">Hoy los viste <span data-first></span>, con el honor de quien eligió servir a la justicia y a la paz.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Escena 7 : sello -->
     <div class="scene" data-duration="7000" data-cue="seal">
       <div class="shot"><div class="shaker">
         <div class="stamp-wrap">
@@ -750,7 +867,15 @@
     <div class="frame"></div>
     <div class="hero-inner">
       <p class="kicker reveal">Centro de Conciliación y Arbitraje · Corporación PESV</p>
-      <h2 class="big reveal" style="margin-top:18px">¡Felicitaciones!</h2>
+      <svg class="hero-cap reveal" viewBox="60 30 180 125" aria-hidden="true">
+        <path d="M110 76 L110 98 Q150 114 190 98 L190 76 Q150 92 110 76 Z" fill="#0b0f1d" stroke="#d4ae5a" stroke-width="1.2"/>
+        <polygon points="68,60 150,82 232,60 232,66 150,88 68,66" fill="#05070f"/>
+        <polygon points="150,38 232,60 150,82 68,60" fill="#1a2238" stroke="#d4ae5a" stroke-width="1.5"/>
+        <path d="M150 60 L206 72 L207 120" stroke="#f3dc9b" stroke-width="2.5" fill="none"/>
+        <circle cx="150" cy="60" r="4" fill="#f3dc9b"/>
+        <path d="M201 118 L213 118 L217 146 L197 146 Z" fill="#d4ae5a"/>
+      </svg>
+      <h2 class="big reveal" style="margin-top:6px">¡Felicitaciones!</h2>
       <div class="name-reveal gold-text reveal" data-name>Nombre del Graduado</div>
       <p class="lead reveal">
         Por culminar con éxito el <strong>Diplomado en Conciliación Extrajudicial en Derecho</strong>.
@@ -898,6 +1023,10 @@
     const params = new URLSearchParams(location.search);
     const nombre = (params.get("nombre") || NOMBRE_POR_DEFECTO).trim();
     document.querySelectorAll("[data-name]").forEach(el => el.textContent = nombre);
+    document.querySelectorAll("[data-first]").forEach(el => el.textContent = nombre.split(/\s+/)[0]);
+    // iniciales bordadas en la estola (sin "de", "del", "la"...)
+    const letrasEstola = nombre.split(/\s+/).filter(w => !/^(de|del|la|las|los|y)$/i.test(w)).map(w => w[0].toUpperCase()).slice(0, 4);
+    document.querySelectorAll("[data-ini]").forEach((el, k) => el.textContent = letrasEstola[k] || "");
     document.title = `Felicitaciones, ${nombre} · Corporación PESV`;
     const year = new Date().getFullYear();
     document.getElementById("year").textContent = year;
@@ -1055,6 +1184,12 @@
           [84, 88, 91, 96, 91, 96, 100].forEach((m, k) => chime(m, t + 2.4 + k * .09, .06));
           pad([48, 55, 60, 64], t + 2.2, 6);
         },
+        invest(t) {
+          pad([41, 48, 53, 57], t, 3.6); pad([48, 52, 55, 60], t + 3.6, 4.8);
+          [60, 64, 67, 72, 76, 79].forEach((m, k) => chime(m, t + .8 + k * .12, .05)); // toga
+          chime(84, t + 2.6, .07); chime(88, t + 2.75, .06);                         // estola
+          swell(t + 2.9, .9, .06);                                                   // birrete bajando
+        },
         seal(t) { pad([41, 48, 53, 57, 60], t, 1.4, .035); swell(t + .2, 1.1, .08); }
       };
       function cue(name) {
@@ -1081,7 +1216,14 @@
           c.connect(filter("highpass", 4000)).connect(cg).connect(bus); c.start(tc); c.stop(tc + .05);
         }
       }
-      return { start, stop, pause, toggleMute, cue, impact, pop };
+      // el birrete se posa en la cabeza
+      function capLand() {
+        if (!bus) return;
+        const t = ctx.currentTime + .01;
+        timp(43, t, .55); chime(91, t, .07); chime(96, t + .08, .05);
+        chords(t, [[[55, 60, 64, 67], 0, 1.8]], .045);
+      }
+      return { start, stop, pause, toggleMute, cue, impact, capLand, pop };
     })();
 
     // =========================================================
@@ -1131,6 +1273,31 @@
         kick();
       }, i * span / n + Math.random() * 250);
     }
+    function launchCaps(n = 14) {
+      if (reduceMotion) return;
+      const W = cCanvas.width, H = cCanvas.height;
+      for (let i = 0; i < n; i++) setTimeout(() => {
+        pieces.push({
+          k: "cap", x: W * (.1 + Math.random() * .8), y: H + 30,
+          vx: (Math.random() - .5) * 4, vy: -Math.sqrt(2 * .3 * H * (.55 + Math.random() * .35)),
+          rot: (Math.random() - .5) * .6, vr: (Math.random() - .5) * .12, flip: Math.random() * 6, s: 14 + Math.random() * 10
+        });
+        kick();
+      }, i * 90 + Math.random() * 120);
+    }
+    function drawCap(p) {
+      const s = p.s;
+      cCtx.save(); cCtx.translate(p.x, p.y); cCtx.rotate(p.rot); cCtx.scale(1, .45 + .55 * Math.abs(Math.cos(p.flip)));
+      cCtx.fillStyle = "#0b0f1d";
+      cCtx.fillRect(-s * .5, 0, s, s * .45);
+      cCtx.beginPath(); cCtx.moveTo(0, -s * .5); cCtx.lineTo(s * 1.1, 0); cCtx.lineTo(0, s * .5); cCtx.lineTo(-s * 1.1, 0); cCtx.closePath();
+      cCtx.fillStyle = "#1a2238"; cCtx.fill();
+      cCtx.strokeStyle = "#d4ae5a"; cCtx.lineWidth = 1.5; cCtx.stroke();
+      cCtx.strokeStyle = "#f3dc9b"; cCtx.lineWidth = 1.5;
+      cCtx.beginPath(); cCtx.moveTo(0, 0); cCtx.lineTo(s * .75, s * .15); cCtx.lineTo(s * .75, s * .8); cCtx.stroke();
+      cCtx.fillStyle = "#d4ae5a"; cCtx.fillRect(s * .75 - 2.5, s * .75, 5, s * .35);
+      cCtx.restore();
+    }
     function particlesTick() {
       cCtx.clearRect(0, 0, cCanvas.width, cCanvas.height);
       pieces.forEach(p => {
@@ -1141,6 +1308,11 @@
           cCtx.fillStyle = p.color;
           cCtx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.cos(p.rot)));
           cCtx.restore();
+          return;
+        }
+        if (p.k === "cap") {
+          p.vy += .3; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.flip += .08;
+          drawCap(p);
           return;
         }
         cCtx.globalCompositeOperation = "lighter";
@@ -1159,7 +1331,7 @@
         }
         cCtx.globalCompositeOperation = "source-over";
       });
-      pieces = pieces.filter(p => p.k === "c" ? p.y < cCanvas.height + 40 : p.k === "r" ? !p.dead : p.life > 0);
+      pieces = pieces.filter(p => p.k === "c" ? p.y < cCanvas.height + 40 : p.k === "cap" ? !(p.vy > 0 && p.y > cCanvas.height + 60) : p.k === "r" ? !p.dead : p.life > 0);
       if (pieces.length) requestAnimationFrame(particlesTick);
       else { cRunning = false; cCtx.clearRect(0, 0, cCanvas.width, cCanvas.height); }
     }
@@ -1228,7 +1400,16 @@
       Sound.cue(s.dataset.cue);
       if (s.hasAttribute("data-fireworks")) launchFireworks(8, 5500);
       if (s.hasAttribute("data-confetti")) setTimeout(() => launchConfetti(260), 1900);
+      if (s.hasAttribute("data-caps")) setTimeout(() => launchCaps(16), 2600);
     }
+
+    // cuando el birrete se posa: chispas doradas y acorde
+    film.querySelector(".gown .cap").addEventListener("animationend", e => {
+      if (e.animationName !== "capOn") return;
+      const r = e.target.getBoundingClientRect();
+      burst(r.left + r.width / 2, r.top + r.height * .35, 50, "#f3dc9b");
+      Sound.capLand();
+    });
 
     // cuando el sello toca la pantalla: temblor, chispas y acorde final
     film.querySelector(".stamp").addEventListener("animationend", e => {
