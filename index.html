@@ -545,50 +545,25 @@
 
     .big.mid { font-size: clamp(1.05rem, min(4.4vw, 6vh), 2.6rem); }
 
-    /* ---------- Investidura: toga, estola y birrete ---------- */
-    .invest { display: grid; justify-items: center; gap: 10px; padding: 0 10px; }
-    .invest .copy { max-width: 520px; }
-    .gown { width: auto; height: min(38vh, 64vw); overflow: visible; }
-    .gown .halo { opacity: 0; }
-    .gown .stole { opacity: 0; }
-    .gown .stole, .gown .band, .gown .sheen, .gown .fringe { transform-box: fill-box; }
-    .scene.active .gown .halo { animation: fadeIn 1.4s .1s forwards; }
-    /* la estola cae, oscila como péndulo y queda meciéndose */
-    .scene.active .gown .stole { transform-origin: 50% 0; animation: drape 1.9s .8s cubic-bezier(.3,.7,.4,1) forwards, stoleSway 5s 2.7s ease-in-out infinite; }
-    /* cada lado se mece por su cuenta, como tela colgando */
-    .gown .band { transform-origin: 50% 0; }
-    .scene.active .gown .band.l { animation: bandSway 4.2s 2.4s ease-in-out infinite; }
-    .scene.active .gown .band.r { animation: bandSway 4.2s 3.1s ease-in-out infinite reverse; }
-    .scene.active .gown .fringe { transform-origin: 50% 0; animation: fringe 1.2s 1.6s ease-in-out 3, fringe 3.4s 5.2s ease-in-out infinite; }
-    .scene.active .gown .sheen { animation: sheen 3.8s 2.4s ease-in-out infinite; }
-    @keyframes fadeIn { to { opacity: 1; } }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
-    @keyframes drape {
-      0% { opacity: 0; transform: translateY(-80px) rotate(0); }
-      25% { opacity: 1; transform: translateY(5px) rotate(0); }
-      38% { transform: translateY(-2px) rotate(3.5deg); }
-      54% { transform: translateY(0) rotate(-2.4deg); }
-      70% { transform: rotate(1.4deg); }
-      85% { transform: rotate(-.6deg); }
-      100% { opacity: 1; transform: none; }
+    /* ---------- Investidura: la estola cae y enmarca el texto ---------- */
+    .invest {
+      --band: clamp(22px, 5.4vmin, 46px); --gap: clamp(14px, 3vw, 38px);
+      position: relative; display: grid; justify-items: center;
+      padding: calc(var(--band) + var(--gap) + 12px) 0 calc(var(--band) * 1.6 + var(--gap));
     }
-    @keyframes stoleSway { 0%, 100% { rotate: -.5deg; } 50% { rotate: .6deg; } }
-    @keyframes sheen { 0% { transform: translateX(0); } 60%, 100% { transform: translateX(200px); } }
-    @keyframes bandSway { 0%, 100% { rotate: -.9deg; } 50% { rotate: 1deg; } }
-    @keyframes fringe { 0%, 100% { transform: none; } 30% { transform: skewX(6deg); } 65% { transform: skewX(-4deg); } }
-
-    @media (max-height: 700px) and (max-aspect-ratio: 5/4) {
-      .gown { height: min(30vh, 64vw); }
-      .invest { gap: 4px; }
-      .invest .rule { margin: 8px auto; }
+    .invest::before {
+      content: ""; position: absolute; left: 50%; top: 50%; width: 130%; height: 120%; translate: -50% -50%;
+      background: radial-gradient(ellipse at center, rgba(243,220,155,.13), transparent 62%); pointer-events: none;
+    }
+    .invest .copy {
+      position: relative; z-index: 1;
+      max-width: min(580px, calc(88vw - 2 * (var(--band) + var(--gap)) - 30px));
+    }
+    .stole-canvas {
+      position: absolute; left: 50%; top: 50%; width: 100vw; height: 100vh;
+      transform: translate(-50%, -50%); pointer-events: none;
     }
     .hero-cap { width: clamp(64px, 12vw, 96px); margin: 0 auto 6px; display: block; filter: drop-shadow(0 8px 18px rgba(0,0,0,.5)); }
-
-    @media (min-aspect-ratio: 5/4) {
-      .invest { grid-template-columns: auto minmax(0, min(520px, 52vw)); align-items: center; gap: 3vw; text-align: left; }
-      .invest .rule { margin-left: 0; }
-      .gown { height: min(60vh, 42vw); }
-    }
 
     /* Pantallas pequeñas y teléfonos en horizontal */
     @media (max-width: 480px) {
@@ -739,70 +714,7 @@
     <!-- Escena 6 : investidura -->
     <div class="scene" data-duration="8600" data-cue="invest">
       <div class="shot invest">
-        <svg class="gown" viewBox="0 0 300 500" aria-label="Estola de graduación: Corporación PESV · Abogado en Derecho">
-          <defs>
-            <radialGradient id="halo" cx="50%" cy="40%" r="60%">
-              <stop offset="0" stop-color="#f3dc9b" stop-opacity=".38"/><stop offset=".55" stop-color="#f3dc9b" stop-opacity=".08"/><stop offset="1" stop-color="#f3dc9b" stop-opacity="0"/>
-            </radialGradient>
-            <!-- satén de la estola -->
-            <linearGradient id="stoleG" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0" stop-color="#4a0a17"/><stop offset=".3" stop-color="#9e2139"/><stop offset=".5" stop-color="#c4435a"/><stop offset=".7" stop-color="#861a2f"/><stop offset="1" stop-color="#3f0813"/>
-            </linearGradient>
-            <linearGradient id="stoleBack" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#7a1628"/><stop offset="1" stop-color="#2e050d"/>
-            </linearGradient>
-            <linearGradient id="stoleFade" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#000" stop-opacity=".25"/><stop offset=".25" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".35"/>
-            </linearGradient>
-            <linearGradient id="sheenG" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#ffe6ea" stop-opacity=".45"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
-            </linearGradient>
-            <linearGradient id="goldG" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stop-color="#f7e3a8"/><stop offset=".5" stop-color="#d4ae5a"/><stop offset="1" stop-color="#8a6a26"/>
-            </linearGradient>
-            <clipPath id="stoleClip">
-              <path d="M88 70 C88 0 212 0 212 70 L168 70 C168 38 132 38 132 70 Z"/>
-              <path d="M88 70 L132 70 L132 452 L88 452 Z"/><path d="M168 70 L212 70 L212 452 L168 452 Z"/>
-            </clipPath>
-          </defs>
-
-          <ellipse class="halo" cx="150" cy="230" rx="150" ry="260" fill="url(#halo)"/>
-
-          <g class="stole">
-            <!-- parte de atrás del cuello -->
-            <path d="M88 70 C88 0 212 0 212 70 L168 70 C168 38 132 38 132 70 Z" fill="url(#stoleBack)"/>
-            <path d="M92 66 C94 8 206 8 208 66 M128 66 C128 34 172 34 172 66" fill="none" stroke="url(#goldG)" stroke-width="1.4"/>
-
-            <!-- lado izquierdo -->
-            <g class="band l">
-              <path d="M88 70 L132 70 L132 452 L88 452 Z" fill="url(#stoleG)"/>
-              <path d="M88 70 L132 70 L132 452 L88 452 Z" fill="url(#stoleFade)"/>
-              <path d="M92 70 L92 452 M128 70 L128 452 M88 434 L132 434" fill="none" stroke="url(#goldG)" stroke-width="1.6"/>
-              <text transform="translate(110 250) rotate(90)" text-anchor="middle" dominant-baseline="central"
-                    font-family="Cinzel, serif" font-weight="700" font-size="17" fill="url(#goldG)"
-                    textLength="300" lengthAdjust="spacing">CORPORACIÓN PESV</text>
-              <g class="fringe" stroke="#e6c77a" stroke-width="1.3">
-                <path d="M90 452 v14 M94 452 v17 M98 452 v14 M102 452 v17 M106 452 v14 M110 452 v17 M114 452 v14 M118 452 v17 M122 452 v14 M126 452 v17 M130 452 v14"/>
-              </g>
-            </g>
-
-            <!-- lado derecho -->
-            <g class="band r">
-              <path d="M168 70 L212 70 L212 452 L168 452 Z" fill="url(#stoleG)"/>
-              <path d="M168 70 L212 70 L212 452 L168 452 Z" fill="url(#stoleFade)"/>
-              <path d="M172 70 L172 452 M208 70 L208 452 M168 434 L212 434" fill="none" stroke="url(#goldG)" stroke-width="1.6"/>
-              <text transform="translate(190 250) rotate(90)" text-anchor="middle" dominant-baseline="central"
-                    font-family="Cinzel, serif" font-weight="700" font-size="17" fill="url(#goldG)"
-                    textLength="300" lengthAdjust="spacing">ABOGADO EN DERECHO</text>
-              <g class="fringe" stroke="#e6c77a" stroke-width="1.3">
-                <path d="M170 452 v14 M174 452 v17 M178 452 v14 M182 452 v17 M186 452 v14 M190 452 v17 M194 452 v14 M198 452 v17 M202 452 v14 M206 452 v17 M210 452 v14"/>
-              </g>
-            </g>
-
-            <!-- brillo del satén que recorre la estola -->
-            <g clip-path="url(#stoleClip)"><rect class="sheen" x="40" y="0" width="40" height="460" fill="url(#sheenG)"/></g>
-          </g>
-        </svg>
+        <canvas class="stole-canvas" aria-label="Estola de graduación: Corporación PESV · Abogado en Derecho"></canvas>
         <div class="copy">
           <p class="kicker anim d3">Acto de investidura</p>
           <div class="rule"></div>
@@ -1502,6 +1414,206 @@
       if (s.hasAttribute("data-confetti")) setTimeout(() => launchConfetti(260), 1900);
       if (s.hasAttribute("data-caps")) setTimeout(() => launchCaps(16), 2600);
     }
+
+    // =========================================================
+    // ESTOLA: tela simulada que cae desde arriba como una bufanda
+    // que se suelta y queda colgando alrededor del texto
+    // =========================================================
+    const Stole = (() => {
+      const box = film.querySelector(".invest"), scene = box.closest(".scene");
+      const copy = box.querySelector(".copy"), cv = box.querySelector(".stole-canvas"), g = cv.getContext("2d");
+      const LEFT = "CORPORACIÓN PESV", RIGHT = "ABOGADO EN DERECHO";
+      const SATIN = ["#5c0d1c", "#7e1629", "#901c31", "#9c2137", "#a4263d", "#9c2137", "#901c31", "#7e1629", "#5c0d1c"];
+      const GRAV = 1900, STEP = 1 / 120;
+      let P = [], N = 0, seg = 0, geo = null, running = false, last = 0, acc = 0, t = 0, dpr = 1, releaseAt = 0;
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+      // barra invisible (cápsula) sobre el texto y largo de la estola
+      function layout() {
+        const W = innerWidth, H = innerHeight;
+        dpr = Math.min(2, devicePixelRatio || 1);
+        cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+        const band = clamp(Math.min(W, H) * .054, 22, 46), gap = clamp(W * .03, 14, 38);
+        const ox = box.clientWidth / 2 - W / 2, oy = box.clientHeight / 2 - H / 2;
+        const x0 = copy.offsetLeft - ox, y0 = copy.offsetTop - oy, cw = copy.offsetWidth, ch = copy.offsetHeight;
+        const cx = x0 + cw / 2, hw = cw / 2 + gap + band / 2;
+        const R = Math.min(hw * .45, band * 1.4 + 26);
+        const ya = y0 - gap - band / 2 + R;
+        const bandLen = Math.max(80, y0 + ch + gap + band * .9 - ya);
+        const L = 2 * bandLen + 2 * (hw - R) + Math.PI * R;
+        geo = { W, H, cx, hw, R, ya, band, bandLen, L, ax: cx - hw + R, bx: cx + hw - R };
+      }
+      // punto de la forma final (para colocarla ya asentada al redimensionar)
+      function draped(a) {
+        const { cx, hw, R, ya, bandLen, ax, bx, L } = geo, top = bx - ax, q = Math.PI * R / 2;
+        if (a <= bandLen) return [cx - hw, ya + bandLen - a];
+        a -= bandLen;
+        if (a <= q) { const th = Math.PI + a / R; return [ax + R * Math.cos(th), ya + R * Math.sin(th)]; }
+        a -= q;
+        if (a <= top) return [ax + a, ya - R];
+        a -= top;
+        if (a <= q) { const th = 1.5 * Math.PI + a / R; return [bx + R * Math.cos(th), ya + R * Math.sin(th)]; }
+        a -= q;
+        return [cx + hw, ya + Math.min(a, bandLen)];
+      }
+      function init(fall) {
+        layout();
+        const { L, cx, W, band } = geo;
+        N = clamp(Math.round(L / 7), 60, 160); seg = L / (N - 1);
+        P = [];
+        for (let i = 0; i < N; i++) {
+          const u = i / (N - 1) - .5;
+          let x, y;
+          if (fall) {
+            // sostenida por los extremos, arriba de la pantalla, con el centro colgando
+            x = cx + u * Math.min(L * .7, W * 1.2);
+            y = -band * 2 - (1 - Math.cos(u * Math.PI)) * 70 + Math.sin(u * 17) * 8;
+          } else [x, y] = draped(i * seg);
+          P.push({ x, y, px: x, py: y });
+        }
+        t = 0; acc = 0;
+      }
+
+      function link(a, b, rest, k, pushOnly) {
+        const dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || 1e-6;
+        if (pushOnly && d >= rest) return;
+        const f = (d - rest) / d * .5 * k;
+        a.x += dx * f; a.y += dy * f; b.x -= dx * f; b.y -= dy * f;
+      }
+      function collide(p) {
+        const qx = clamp(p.x, geo.ax, geo.bx), dx = p.x - qx, dy = p.y - geo.ya, d = Math.hypot(dx, dy);
+        if (d < geo.R && d > 1e-6) {
+          const s = geo.R / d;
+          p.x = qx + dx * s; p.y = geo.ya + dy * s;
+          p.px += (p.x - p.px) * .2; p.py += (p.y - p.py) * .2;   // fricción con la barra
+        }
+      }
+      function step(dt) {
+        t += dt;
+        const breeze = clamp((t - 2.2) / 2.5, 0, 1);
+        for (let i = 0; i < N; i++) {
+          const p = P[i], u = Math.abs(i / (N - 1) - .5) * 2;
+          const vx = (p.x - p.px) * .99, vy = (p.y - p.py) * .99;
+          p.px = p.x; p.py = p.y;
+          const wind = breeze * u * u * (70 * Math.sin(t * .9 + i * .05) + 25 * Math.sin(t * 2.3 + i * .13));
+          p.x += vx + wind * dt * dt;
+          p.y += vy + GRAV * dt * dt;
+        }
+        for (let k = 0; k < 16; k++) {
+          for (let i = 0; i < N - 1; i++) link(P[i], P[i + 1], seg, 1);
+          if (k % 2 === 0) for (let i = 0; i < N - 2; i++) link(P[i], P[i + 2], seg * 1.97, .15, true);
+          for (let i = 0; i < N; i++) collide(P[i]);
+        }
+        const m = P[N >> 1]; m.x += (geo.cx - m.x) * .01;   // se mantiene centrada
+      }
+
+      function draw() {
+        const { band, W, H } = geo, n = N;
+        g.setTransform(dpr, 0, 0, dpr, 0, 0);
+        g.clearRect(0, 0, W, H);
+        const nx = new Float32Array(n), ny = new Float32Array(n), A = new Float32Array(n);
+        for (let i = 0; i < n; i++) {
+          const a = P[Math.max(0, i - 1)], b = P[Math.min(n - 1, i + 1)];
+          const tx = b.x - a.x, ty = b.y - a.y, l = Math.hypot(tx, ty) || 1;
+          nx[i] = -ty / l; ny[i] = tx / l;
+          if (i) A[i] = A[i - 1] + Math.hypot(P[i].x - P[i - 1].x, P[i].y - P[i - 1].y);
+        }
+        const path = off => {
+          g.beginPath();
+          for (let i = 0; i < n; i++) { const x = P[i].x + nx[i] * off, y = P[i].y + ny[i] * off; i ? g.lineTo(x, y) : g.moveTo(x, y); }
+        };
+        g.lineJoin = "round"; g.lineCap = "butt";
+        // sombra sobre el fondo
+        g.save(); g.shadowColor = "rgba(0,0,0,.45)"; g.shadowBlur = 22; g.shadowOffsetY = 10;
+        path(0); g.lineWidth = band; g.strokeStyle = "#3f0813"; g.stroke(); g.restore();
+        // satén: franjas de color a lo ancho
+        const K = SATIN.length, sw = band / K;
+        for (let k = 0; k < K; k++) { path(-band / 2 + (k + .5) * sw); g.lineWidth = sw + .9; g.strokeStyle = SATIN[k]; g.stroke(); }
+        // pliegues (según la curvatura), luz en lo horizontal y brillo que recorre la tela
+        const sheenAt = (t * 300) % (geo.L + 800) - 400;
+        g.lineWidth = band * .98;
+        for (let i = 1; i < n - 2; i++) {
+          const a = P[i], b = P[i + 1], c = P[i - 1];
+          const dx = b.x - a.x, dy = b.y - a.y, l = Math.hypot(dx, dy) || 1;
+          const bend = Math.abs(Math.atan2(dx * (a.y - c.y) - dy * (a.x - c.x), dx * (a.x - c.x) + dy * (a.y - c.y)));
+          const dark = Math.min(.45, bend * 2.2);
+          const lite = Math.abs(dx) / l * .07 + Math.exp(-(((A[i] - sheenAt) / 90) ** 2)) * .22;
+          g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y);
+          if (dark > .02) { g.strokeStyle = `rgba(0,0,0,${dark})`; g.stroke(); }
+          if (lite > .02) { g.strokeStyle = `rgba(255,236,240,${lite})`; g.stroke(); }
+        }
+        // ribete dorado
+        g.lineWidth = 1.4; g.strokeStyle = "rgba(236,204,132,.95)";
+        path(band / 2 - band * .13); g.stroke();
+        path(-band / 2 + band * .13); g.stroke();
+        // barras doradas y flecos en las puntas
+        [[0, 1], [n - 1, -1]].forEach(([i, dir]) => {
+          const j = i + dir * 3, p = P[i];
+          let ex = p.x - P[i + dir].x, ey = p.y - P[i + dir].y; const el = Math.hypot(ex, ey) || 1; ex /= el; ey /= el;
+          g.strokeStyle = "rgba(236,204,132,.95)"; g.lineWidth = 2;
+          g.beginPath(); g.moveTo(P[j].x + nx[j] * band / 2, P[j].y + ny[j] * band / 2); g.lineTo(P[j].x - nx[j] * band / 2, P[j].y - ny[j] * band / 2); g.stroke();
+          const vx = p.x - p.px, vy = p.y - p.py;
+          g.strokeStyle = "#e6c77a"; g.lineWidth = 1.2;
+          for (let f = 0; f < 12; f++) {
+            const o = -band / 2 + (f + .5) * band / 12, len = band * .42 + (f % 2) * 3;
+            const sx = p.x + nx[i] * o, sy = p.y + ny[i] * o;
+            g.beginPath(); g.moveTo(sx, sy); g.lineTo(sx + ex * len - vx * 2, sy + ey * len - vy * 2); g.stroke();
+          }
+        });
+        // letras bordadas que siguen la tela
+        const at = a => {
+          let i = 1; while (i < n - 1 && A[i] < a) i++;
+          const s = (a - A[i - 1]) / ((A[i] - A[i - 1]) || 1);
+          return [P[i - 1].x + (P[i].x - P[i - 1].x) * s, P[i - 1].y + (P[i].y - P[i - 1].y) * s, P[i].x - P[i - 1].x, P[i].y - P[i - 1].y];
+        };
+        const total = A[n - 1], bandLen = geo.bandLen * (total / geo.L);
+        const words = (str, center, dir) => {
+          let fs = band * .46; g.font = `700 ${fs}px Cinzel, serif`;
+          const sp = () => fs * .32;
+          let ws = [...str].map(ch => g.measureText(ch).width), T = ws.reduce((s, w) => s + w, 0) + sp() * (ws.length - 1);
+          if (T > bandLen * .82) { fs *= bandLen * .82 / T; g.font = `700 ${fs}px Cinzel, serif`; ws = [...str].map(ch => g.measureText(ch).width); T = ws.reduce((s, w) => s + w, 0) + sp() * (ws.length - 1); }
+          g.fillStyle = "#f1d690"; g.textBaseline = "middle";
+          g.shadowColor = "rgba(0,0,0,.4)"; g.shadowBlur = 2;
+          let off = 0;
+          [...str].forEach((ch, k) => {
+            const a = center + dir * (off + ws[k] / 2 - T / 2);
+            const [x, y, dx, dy] = at(a);
+            g.save(); g.translate(x, y); g.rotate(Math.atan2(dir * dy, dir * dx));
+            g.fillText(ch, -ws[k] / 2, 0); g.restore();
+            off += ws[k] + sp();
+          });
+          g.shadowBlur = 0;
+        };
+        // se lee de arriba hacia abajo en ambos lados
+        words(LEFT, bandLen * .54, -1);
+        words(RIGHT, total - bandLen * .54, 1);
+      }
+
+      function frame(now) {
+        if (!running) return;
+        const dt = Math.min(.05, (now - last) / 1000); last = now;
+        if (!paused && now >= releaseAt) {
+          acc += dt;
+          while (acc >= STEP) { step(STEP); acc -= STEP; }
+        }
+        draw();
+        requestAnimationFrame(frame);
+      }
+      function start() {
+        init(true);
+        releaseAt = performance.now() + 300;
+        last = performance.now();
+        if (!running) { running = true; requestAnimationFrame(frame); }
+      }
+      function stop() { running = false; g.clearRect(0, 0, cv.width, cv.height); }
+
+      new MutationObserver(() => {
+        if (scene.classList.contains("active") && !scene.classList.contains("leaving")) { if (!running) start(); }
+        else if (!scene.classList.contains("active")) stop();
+      }).observe(scene, { attributes: true, attributeFilter: ["class"] });
+      addEventListener("resize", () => { if (running) init(false); });
+      return { start, stop };
+    })();
 
     // cuando el sello toca la pantalla: temblor, chispas y acorde final
     film.querySelector(".stamp").addEventListener("animationend", e => {
