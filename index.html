@@ -99,11 +99,15 @@
     .scene.active .anim.d3 { animation-delay: 1.8s; }
     .scene.active .anim.d4 { animation-delay: 2.5s; }
     .scene.leaving { animation: sceneOut .9s ease forwards; }
+    .scene.leaving .rays { animation: none; opacity: 0; }
+    /* al salir, el contenido se congela: la escena se desvanece como una imagen fija, sin repintar */
+    .scene.leaving .shot, .scene.leaving .shot * { animation-play-state: paused !important; }
+    .scene.leaving .write { filter: none; }
     @keyframes rise {
       from { opacity: 0; transform: translateY(26px) scale(.98); filter: blur(8px); letter-spacing: .02em; }
       to   { opacity: 1; transform: none; filter: blur(0); }
     }
-    @keyframes sceneOut { to { opacity: 0; transform: scale(1.06); filter: blur(6px); } }
+    @keyframes sceneOut { to { opacity: 0; transform: scale(1.06); } }
 
     .kicker {
       font-family: "Inter", sans-serif; font-size: clamp(.7rem, 1.8vw, .85rem);
@@ -165,6 +169,7 @@
 
     /* Movimiento de cámara lento en cada escena */
     .scene.active .shot { animation: push var(--dur, 6s) linear forwards; }
+    .scene.active .shot.invest { animation: none; }
     @keyframes push { from { transform: scale(1); } to { transform: scale(1.08); } }
     .scene.active .anim.d5 { animation-delay: 3.1s; }
 
@@ -191,13 +196,15 @@
     @keyframes streak { 0% { opacity: 0; transform: translateX(-100%); } 25% { opacity: 1; } 100% { opacity: 0; transform: translateX(150vw); } }
 
     /* Reflectores que barren el escenario */
-    .lights-rig { position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0; transition: opacity 1.2s; }
-    .film.lights .lights-rig { opacity: 1; }
+    .lights-rig { position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0; visibility: hidden; transition: opacity 1.2s, visibility 1.2s; }
+    .film.lights .lights-rig { opacity: 1; visibility: visible; }
     .searchlight {
       position: absolute; bottom: -8%; width: 36vw; height: 130vh; transform-origin: 50% 100%;
-      background: linear-gradient(0deg, rgba(243,220,155,.38), rgba(243,220,155,0) 85%);
+      background:
+        linear-gradient(90deg, rgba(7,13,28,.9), transparent 22%, transparent 78%, rgba(7,13,28,.9)),
+        linear-gradient(0deg, rgba(243,220,155,.3), rgba(243,220,155,0) 85%);
       clip-path: polygon(47% 100%, 53% 100%, 100% 0, 0 0);
-      filter: blur(5px); mix-blend-mode: screen;
+      will-change: transform;
     }
     .searchlight.l { left: 0; animation: sweepL 3.6s ease-in-out infinite alternate; }
     .searchlight.r { right: 0; animation: sweepR 3.6s ease-in-out infinite alternate; }
@@ -1036,7 +1043,7 @@
         n.connect(filter("bandpass", f * 3)).connect(ng).connect(bus); n.start(t); n.stop(t + .2);
       }
       function roll(m, t, d) {
-        for (let x = 0, k = 0; x < d; x += .055, k++) timp(m + (k % 2) * .2, t + x, .05 + .45 * (x / d) ** 2, .4);
+        for (let x = 0, k = 0; x < d; x += .055, k++) { const at = t + x, mm = m + (k % 2) * .2, vv = .05 + .45 * (x / d) ** 2; later(at, () => timp(mm, at, vv, .4)); }
       }
       function cymbal(t, v = .35) {
         const n = noiseSrc(), g = ctx.createGain();
@@ -1071,8 +1078,15 @@
           o.connect(lp); o.start(t); o.stop(t + d + 2.5);
         }));
       }
-      const phrase = (t, notes, v) => notes.forEach(([m, at, d]) => brass(m, t + at, d, v));
-      const chords = (t, list, v) => list.forEach(([ms, at, d]) => ms.forEach(m => brass(m, t + at, d, v)));
+      // crea cada sonido medio segundo antes de que suene, en vez de cientos de golpe al iniciar la escena
+      function later(at, fn) {
+        const wait = at - ctx.currentTime - .5;
+        if (wait <= 0) return fn();
+        const b = bus;
+        setTimeout(() => { if (bus && bus === b) fn(); }, wait * 1000);
+      }
+      const phrase = (t, notes, v) => notes.forEach(([m, at, d]) => later(t + at, () => brass(m, t + at, d, v)));
+      const chords = (t, list, v) => list.forEach(([ms, at, d]) => later(t + at, () => ms.forEach(m => brass(m, t + at, d, v))));
 
       // ---------- percusión y cuerdas para la banda sonora épica ----------
       function kick(t, v = .9) {
@@ -1127,7 +1141,7 @@
       // toca compases desde t durante "dur" segundos con las capas pedidas
       function groove(t, dur, o = {}) {
         const end = t + dur, first = o.from || 0;
-        for (let k = 0; t + k * BAR < end; k++) {
+        for (let k = 0; t + k * BAR < end; k++) later(t + k * BAR, () => {
           const bt = t + k * BAR, ch = PROG[(k + first) % 4];
           for (let s = 0; s < 8; s++) {
             const st = bt + s * E8;
@@ -1144,10 +1158,10 @@
           if (o.stab && bt < end) chords(bt, [[ch.c, 0, .35]], o.stab);
           if (o.crash && k % 2 === 0) cymbal(bt, o.crash);
           if (o.taiko) taiko(bt, o.taiko);
-        }
+        });
       }
       function snareRoll(t, d, v = .4) {
-        for (let x = 0; x < d; x += .06 - .03 * (x / d)) snare(t + x, .05 + v * (x / d) ** 1.6);
+        for (let x = 0; x < d; x += .06 - .03 * (x / d)) { const at = t + x, vv = .05 + v * (x / d) ** 1.6; later(at, () => snare(at, vv)); }
       }
       // melodía heroica de metales sobre la progresión
       const HERO = [[76, 0, .75], [74, .75, .25], [72, 1, 1], [72, 2, .5], [69, 2.5, .5], [72, 3, 1], [79, 4, 1.5], [76, 5.5, .5], [74, 6, .75], [72, 6.75, .25], [74, 7, 1]];
@@ -1425,14 +1439,17 @@
       const LEFT = "CORPORACIÓN PESV", RIGHT = "ABOGADO EN DERECHO";
       const SATIN = ["#5c0d1c", "#7e1629", "#901c31", "#9c2137", "#a4263d", "#9c2137", "#901c31", "#7e1629", "#5c0d1c"];
       const GRAV = 1900, STEP = 1 / 120;
-      let P = [], N = 0, seg = 0, geo = null, running = false, last = 0, acc = 0, t = 0, dpr = 1, releaseAt = 0;
+      let P = [], N = 0, seg = 0, geo = null, running = false, last = 0, acc = 0, t = 0, dpr = 1, releaseAt = 0, lowQuality = false, slow = 0, sharp = false;
       const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
       // barra invisible (cápsula) sobre el texto y largo de la estola
       function layout() {
         const W = innerWidth, H = innerHeight;
-        dpr = Math.min(2, devicePixelRatio || 1);
-        cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+        dpr = lowQuality || !sharp ? 1 : Math.min(1.25, devicePixelRatio || 1);
+        const cw0 = Math.round(W * dpr), ch0 = Math.round(H * dpr);
+        if (cv.width !== cw0 || cv.height !== ch0) { cv.width = cw0; cv.height = ch0; }
+        else g.clearRect(0, 0, cv.width, cv.height);
+        lastBox = null;
         const band = clamp(Math.min(W, H) * .054, 22, 46), gap = clamp(W * .03, 14, 38);
         const ox = box.clientWidth / 2 - W / 2, oy = box.clientHeight / 2 - H / 2;
         const x0 = copy.offsetLeft - ox, y0 = copy.offsetTop - oy, cw = copy.offsetWidth, ch = copy.offsetHeight;
@@ -1459,7 +1476,8 @@
       function init(fall) {
         layout();
         const { L, cx, W, band } = geo;
-        N = clamp(Math.round(L / 7), 60, 160); seg = L / (N - 1);
+        N = clamp(Math.round(L / 8), 60, 130); seg = L / (N - 1);
+        nx = new Float32Array(N); ny = new Float32Array(N); A = new Float32Array(N);
         P = [];
         for (let i = 0; i < N; i++) {
           const u = i / (N - 1) - .5;
@@ -1475,13 +1493,13 @@
       }
 
       function link(a, b, rest, k, pushOnly) {
-        const dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || 1e-6;
+        const dx = b.x - a.x, dy = b.y - a.y, d = Math.sqrt((dx) ** 2 + (dy) ** 2) || 1e-6;
         if (pushOnly && d >= rest) return;
         const f = (d - rest) / d * .5 * k;
         a.x += dx * f; a.y += dy * f; b.x -= dx * f; b.y -= dy * f;
       }
       function collide(p) {
-        const qx = clamp(p.x, geo.ax, geo.bx), dx = p.x - qx, dy = p.y - geo.ya, d = Math.hypot(dx, dy);
+        const qx = clamp(p.x, geo.ax, geo.bx), dx = p.x - qx, dy = p.y - geo.ya, d = Math.sqrt((dx) ** 2 + (dy) ** 2);
         if (d < geo.R && d > 1e-6) {
           const s = geo.R / d;
           p.x = qx + dx * s; p.y = geo.ya + dy * s;
@@ -1499,7 +1517,7 @@
           p.x += vx + wind * dt * dt;
           p.y += vy + GRAV * dt * dt;
         }
-        for (let k = 0; k < 16; k++) {
+        for (let k = 0; k < 10; k++) {
           for (let i = 0; i < N - 1; i++) link(P[i], P[i + 1], seg, 1);
           if (k % 2 === 0) for (let i = 0; i < N - 2; i++) link(P[i], P[i + 2], seg * 1.97, .15, true);
           for (let i = 0; i < N; i++) collide(P[i]);
@@ -1507,99 +1525,126 @@
         const m = P[N >> 1]; m.x += (geo.cx - m.x) * .01;   // se mantiene centrada
       }
 
+      // capas del satén: del borde (más oscuro) al centro (más claro), sobre la misma línea
+      const SATIN_LAYERS = [[1, "#5c0d1c"], [.78, "#86182d"], [.36, "#9e2439"]];
+      const DARK = [.08, .16, .26, .38], LITE = [.05, .1, .17, .26];
+      let nx, ny, A, lastBox = null, widths = { fs: 0 };
+      const gold = "rgba(236,204,132,.95)";
+
+      // anchos de cada letra, medidos una sola vez por tamaño
+      function measure(fs) {
+        if (widths.fs === fs) return widths;
+        g.setTransform(1, 0, 0, 1, 0, 0);
+        g.font = `700 ${fs}px Cinzel, serif`;
+        const m = str => { const w = [...str].map(ch => g.measureText(ch).width); return { w, T: w.reduce((s, v) => s + v, 0) + fs * .32 * (w.length - 1) }; };
+        return widths = { fs, L: m(LEFT), R: m(RIGHT) };
+      }
+
       function draw() {
-        const { band, W, H } = geo, n = N;
+        const { band } = geo, n = N;
         g.setTransform(dpr, 0, 0, dpr, 0, 0);
-        g.clearRect(0, 0, W, H);
-        const nx = new Float32Array(n), ny = new Float32Array(n), A = new Float32Array(n);
+        // borra solo la zona que ocupaba la estola en el cuadro anterior
+        if (lastBox) g.clearRect(lastBox[0], lastBox[1], lastBox[2], lastBox[3]);
+        let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
         for (let i = 0; i < n; i++) {
-          const a = P[Math.max(0, i - 1)], b = P[Math.min(n - 1, i + 1)];
-          const tx = b.x - a.x, ty = b.y - a.y, l = Math.hypot(tx, ty) || 1;
+          const a = P[i > 0 ? i - 1 : 0], b = P[i < n - 1 ? i + 1 : n - 1], p = P[i];
+          const tx = b.x - a.x, ty = b.y - a.y, l = Math.sqrt((tx) ** 2 + (ty) ** 2) || 1;
           nx[i] = -ty / l; ny[i] = tx / l;
-          if (i) A[i] = A[i - 1] + Math.hypot(P[i].x - P[i - 1].x, P[i].y - P[i - 1].y);
+          A[i] = i ? A[i - 1] + Math.sqrt((p.x - P[i - 1].x) ** 2 + (p.y - P[i - 1].y) ** 2) : 0;
+          if (p.x < x0) x0 = p.x; if (p.x > x1) x1 = p.x; if (p.y < y0) y0 = p.y; if (p.y > y1) y1 = p.y;
         }
-        const path = off => {
-          g.beginPath();
-          for (let i = 0; i < n; i++) { const x = P[i].x + nx[i] * off, y = P[i].y + ny[i] * off; i ? g.lineTo(x, y) : g.moveTo(x, y); }
+        const mg = band * 1.5 + 24;
+        lastBox = [x0 - mg, y0 - mg, x1 - x0 + 2 * mg, y1 - y0 + 2 * mg];
+
+        const line = (off, dy = 0) => {
+          const path = new Path2D();
+          for (let i = 0; i < n; i++) { const x = P[i].x + nx[i] * off, y = P[i].y + ny[i] * off + dy; i ? path.lineTo(x, y) : path.moveTo(x, y); }
+          return path;
         };
-        g.lineJoin = "round"; g.lineCap = "butt";
-        // sombra sobre el fondo
-        g.save(); g.shadowColor = "rgba(0,0,0,.45)"; g.shadowBlur = 22; g.shadowOffsetY = 10;
-        path(0); g.lineWidth = band; g.strokeStyle = "#3f0813"; g.stroke(); g.restore();
-        // satén: franjas de color a lo ancho
-        const K = SATIN.length, sw = band / K;
-        for (let k = 0; k < K; k++) { path(-band / 2 + (k + .5) * sw); g.lineWidth = sw + .9; g.strokeStyle = SATIN[k]; g.stroke(); }
-        // pliegues (según la curvatura), luz en lo horizontal y brillo que recorre la tela
+        g.lineJoin = "bevel"; g.lineCap = "butt";
+        // sombra suave sobre el fondo (dos trazos translúcidos, sin desenfoque)
+        const shadow = line(0, 9);
+        g.strokeStyle = "rgba(0,0,0,.28)"; g.lineWidth = band + 8; g.stroke(shadow);
+        // satén
+        const mid = line(0);
+        for (const [f, c] of SATIN_LAYERS) { g.strokeStyle = c; g.lineWidth = band * f; g.stroke(mid); }
+        // pliegues y brillo, agrupados por intensidad (pocos trazos por cuadro)
         const sheenAt = (t * 300) % (geo.L + 800) - 400;
-        g.lineWidth = band * .98;
+        const dk = DARK.map(() => new Path2D()), lt = LITE.map(() => new Path2D());
         for (let i = 1; i < n - 2; i++) {
           const a = P[i], b = P[i + 1], c = P[i - 1];
-          const dx = b.x - a.x, dy = b.y - a.y, l = Math.hypot(dx, dy) || 1;
+          const dx = b.x - a.x, dy = b.y - a.y, l = Math.sqrt((dx) ** 2 + (dy) ** 2) || 1;
           const bend = Math.abs(Math.atan2(dx * (a.y - c.y) - dy * (a.x - c.x), dx * (a.x - c.x) + dy * (a.y - c.y)));
           const dark = Math.min(.45, bend * 2.2);
-          const lite = Math.abs(dx) / l * .07 + Math.exp(-(((A[i] - sheenAt) / 90) ** 2)) * .22;
-          g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y);
-          if (dark > .02) { g.strokeStyle = `rgba(0,0,0,${dark})`; g.stroke(); }
-          if (lite > .02) { g.strokeStyle = `rgba(255,236,240,${lite})`; g.stroke(); }
+          const s = (A[i] - sheenAt) / 90, lite = Math.abs(dx) / l * .07 + (s > -3 && s < 3 ? Math.exp(-s * s) * .22 : 0);
+          if (dark > .04) { const k = Math.min(3, Math.floor(dark / .1)); dk[k].moveTo(a.x, a.y); dk[k].lineTo(b.x, b.y); }
+          if (lite > .03) { const k = Math.min(3, Math.floor(lite / .065)); lt[k].moveTo(a.x, a.y); lt[k].lineTo(b.x, b.y); }
         }
+        g.lineWidth = band * .98;
+        dk.forEach((path, k) => { g.strokeStyle = `rgba(0,0,0,${DARK[k]})`; g.stroke(path); });
+        lt.forEach((path, k) => { g.strokeStyle = `rgba(255,236,240,${LITE[k]})`; g.stroke(path); });
         // ribete dorado
-        g.lineWidth = 1.4; g.strokeStyle = "rgba(236,204,132,.95)";
-        path(band / 2 - band * .13); g.stroke();
-        path(-band / 2 + band * .13); g.stroke();
+        g.lineWidth = 1.4; g.strokeStyle = gold;
+        g.stroke(line(band / 2 - band * .13)); g.stroke(line(-band / 2 + band * .13));
         // barras doradas y flecos en las puntas
+        const bars = new Path2D(), fringe = new Path2D();
         [[0, 1], [n - 1, -1]].forEach(([i, dir]) => {
           const j = i + dir * 3, p = P[i];
-          let ex = p.x - P[i + dir].x, ey = p.y - P[i + dir].y; const el = Math.hypot(ex, ey) || 1; ex /= el; ey /= el;
-          g.strokeStyle = "rgba(236,204,132,.95)"; g.lineWidth = 2;
-          g.beginPath(); g.moveTo(P[j].x + nx[j] * band / 2, P[j].y + ny[j] * band / 2); g.lineTo(P[j].x - nx[j] * band / 2, P[j].y - ny[j] * band / 2); g.stroke();
+          let ex = p.x - P[i + dir].x, ey = p.y - P[i + dir].y; const el = Math.sqrt((ex) ** 2 + (ey) ** 2) || 1; ex /= el; ey /= el;
+          bars.moveTo(P[j].x + nx[j] * band / 2, P[j].y + ny[j] * band / 2); bars.lineTo(P[j].x - nx[j] * band / 2, P[j].y - ny[j] * band / 2);
           const vx = p.x - p.px, vy = p.y - p.py;
-          g.strokeStyle = "#e6c77a"; g.lineWidth = 1.2;
           for (let f = 0; f < 12; f++) {
             const o = -band / 2 + (f + .5) * band / 12, len = band * .42 + (f % 2) * 3;
             const sx = p.x + nx[i] * o, sy = p.y + ny[i] * o;
-            g.beginPath(); g.moveTo(sx, sy); g.lineTo(sx + ex * len - vx * 2, sy + ey * len - vy * 2); g.stroke();
+            fringe.moveTo(sx, sy); fringe.lineTo(sx + ex * len - vx * 2, sy + ey * len - vy * 2);
           }
         });
-        // letras bordadas que siguen la tela
-        const at = a => {
-          let i = 1; while (i < n - 1 && A[i] < a) i++;
-          const s = (a - A[i - 1]) / ((A[i] - A[i - 1]) || 1);
-          return [P[i - 1].x + (P[i].x - P[i - 1].x) * s, P[i - 1].y + (P[i].y - P[i - 1].y) * s, P[i].x - P[i - 1].x, P[i].y - P[i - 1].y];
-        };
+        g.lineWidth = 2; g.stroke(bars);
+        g.strokeStyle = "#e6c77a"; g.lineWidth = 1.2; g.stroke(fringe);
+
+        // letras bordadas que siguen la tela (anchos en caché, sin sombras)
         const total = A[n - 1], bandLen = geo.bandLen * (total / geo.L);
-        const words = (str, center, dir) => {
-          let fs = band * .46; g.font = `700 ${fs}px Cinzel, serif`;
-          const sp = () => fs * .32;
-          let ws = [...str].map(ch => g.measureText(ch).width), T = ws.reduce((s, w) => s + w, 0) + sp() * (ws.length - 1);
-          if (T > bandLen * .82) { fs *= bandLen * .82 / T; g.font = `700 ${fs}px Cinzel, serif`; ws = [...str].map(ch => g.measureText(ch).width); T = ws.reduce((s, w) => s + w, 0) + sp() * (ws.length - 1); }
-          g.fillStyle = "#f1d690"; g.textBaseline = "middle";
-          g.shadowColor = "rgba(0,0,0,.4)"; g.shadowBlur = 2;
-          let off = 0;
+        let W = measure(Math.round(band * .46));
+        const worst = Math.max(W.L.T, W.R.T);
+        if (worst > bandLen * .82) W = measure(Math.max(8, Math.floor(W.fs * bandLen * .82 / worst)));
+        g.font = `700 ${W.fs}px Cinzel, serif`; g.fillStyle = "#f1d690"; g.textBaseline = "middle";
+        const words = (str, m, center, dir) => {
+          let off = 0, i = 1;
           [...str].forEach((ch, k) => {
-            const a = center + dir * (off + ws[k] / 2 - T / 2);
-            const [x, y, dx, dy] = at(a);
-            g.save(); g.translate(x, y); g.rotate(Math.atan2(dir * dy, dir * dx));
-            g.fillText(ch, -ws[k] / 2, 0); g.restore();
-            off += ws[k] + sp();
+            const a = center + dir * (off + m.w[k] / 2 - m.T / 2);
+            if (dir > 0) { while (i < n - 1 && A[i] < a) i++; } else { i = n - 1; while (i > 1 && A[i - 1] > a) i--; }
+            const s = (a - A[i - 1]) / ((A[i] - A[i - 1]) || 1);
+            const x = P[i - 1].x + (P[i].x - P[i - 1].x) * s, y = P[i - 1].y + (P[i].y - P[i - 1].y) * s;
+            const ang = Math.atan2(dir * (P[i].y - P[i - 1].y), dir * (P[i].x - P[i - 1].x)), co = Math.cos(ang), si = Math.sin(ang);
+            g.setTransform(dpr * co, dpr * si, -dpr * si, dpr * co, dpr * x, dpr * y);
+            g.fillText(ch, -m.w[k] / 2, 0);
+            off += m.w[k] + W.fs * .32;
           });
-          g.shadowBlur = 0;
         };
-        // se lee de arriba hacia abajo en ambos lados
-        words(LEFT, bandLen * .54, -1);
-        words(RIGHT, total - bandLen * .54, 1);
+        words(LEFT, W.L, bandLen * .54, -1);
+        words(RIGHT, W.R, total - bandLen * .54, 1);
       }
 
       function frame(now) {
         if (!running) return;
         const dt = Math.min(.05, (now - last) / 1000); last = now;
-        if (!paused && now >= releaseAt) {
-          acc += dt;
-          while (acc >= STEP) { step(STEP); acc -= STEP; }
+        if (!paused) {
+          if (now >= releaseAt) {
+            acc += dt;
+            // como máximo 3 pasos por cuadro: en equipos lentos no se acumula trabajo
+            for (let k = 0; k < 3 && acc >= STEP; k++) { step(STEP); acc -= STEP; }
+            if (acc >= STEP) acc = 0;
+          }
+          draw();
+          // si el equipo va lento, baja la resolución del lienzo una sola vez
+          slow = dt > .03 ? slow + 1 : 0;
+          if (slow > 20 && !lowQuality && dpr > 1) { lowQuality = true; layout(); }
+          if (!sharp && t > 4.2) { sharp = true; if (!lowQuality) layout(); }
         }
-        draw();
         requestAnimationFrame(frame);
       }
       function start() {
+        sharp = false;   // mientras cae se dibuja a resolución normal; al quedar quieta, en alta
         init(true);
         releaseAt = performance.now() + 300;
         last = performance.now();
@@ -1612,6 +1657,7 @@
         else if (!scene.classList.contains("active")) stop();
       }).observe(scene, { attributes: true, attributeFilter: ["class"] });
       addEventListener("resize", () => { if (running) init(false); });
+      (window.requestIdleCallback || setTimeout)(() => { layout(); measure(Math.round(geo.band * .46)); });
       return { start, stop };
     })();
 
