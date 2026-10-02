@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Felicitaciones · Corporación PESV</title>
   <meta name="description" content="Centro de Conciliación y Arbitraje Corporación PESV felicita a su graduado del Diplomado en Conciliación Extrajudicial en Derecho.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="¡Felicitaciones, Oscar Augusto García Ríos!">
+  <meta property="og:description" content="Ceremonia de grado · Diplomado en Conciliación Extrajudicial en Derecho · Corporación PESV">
+  <meta property="og:image" content="https://mariocodem.github.io/felicitaciones-pesv/graduado.jpg">
+  <meta property="og:image:width" content="690">
+  <meta property="og:image:height" content="1024">
+  <meta property="og:url" content="https://mariocodem.github.io/felicitaciones-pesv/">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preload" as="image" href="graduado.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Great+Vibes&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -347,7 +356,7 @@
     .hero {
       position: relative; min-height: 100vh; min-height: 100svh;
       display: grid; place-items: center; text-align: center;
-      padding: 80px 16px;
+      padding: 80px 16px 110px;
       background:
         radial-gradient(ellipse at 50% 0%, rgba(212,174,90,.18), transparent 55%),
         linear-gradient(180deg, var(--bg-2), var(--bg));
@@ -356,6 +365,63 @@
     .hero .frame { position: absolute; inset: 20px; border: 1px solid var(--line); pointer-events: none; }
     .hero .rays { opacity: .55; animation: turn 60s linear infinite; }
     .hero-inner { position: relative; max-width: 900px; }
+
+    /* ---------- Retrato del graduado (marco dorado) ---------- */
+    .portrait {
+      --pad: clamp(6px, 1vw, 10px);
+      position: relative; margin: 0; padding: var(--pad); aspect-ratio: 4 / 5;
+      background: linear-gradient(135deg, var(--gold-3), var(--gold-2) 30%, var(--gold) 55%, var(--gold-3) 80%, var(--gold-2));
+      border-radius: 4px;
+      box-shadow: 0 30px 70px rgba(0,0,0,.6), 0 0 0 1px rgba(0,0,0,.4) inset;
+    }
+    .portrait::after {
+      content: ""; position: absolute; inset: calc(var(--pad) + 6px); z-index: 2; pointer-events: none;
+      border: 1px solid rgba(243,220,155,.75); box-shadow: 0 0 0 1px rgba(0,0,0,.25);
+    }
+    .portrait .ph { position: relative; height: 100%; overflow: hidden; background: #0b1224; }
+    .portrait img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 8%; }
+    .portrait .ph::after {
+      /* reflejo de luz que cruza la foto */
+      content: ""; position: absolute; top: 0; bottom: 0; left: -60%; width: 40%;
+      background: linear-gradient(100deg, transparent, rgba(255,255,255,.16), transparent);
+      transform: skewX(-18deg); animation: glare 8s ease-in-out 2s infinite; pointer-events: none;
+    }
+
+    /* en el video: entra con el destello y la cámara se aleja despacio */
+    .reveal-grid { display: grid; justify-items: center; align-items: center; gap: clamp(8px, 2.2vh, 22px); max-width: 90vw; }
+    .reveal-grid .portrait { height: min(26vh, 66vw); opacity: 0; }
+    .scene.active .reveal-grid .portrait { animation: photoIn 1.5s .2s cubic-bezier(.2,.7,.2,1) forwards; }
+    .scene.active .reveal-grid .portrait img { animation: photoZoom 9s linear forwards; }
+    @keyframes photoIn { from { opacity: 0; transform: scale(1.12) translateY(16px); } to { opacity: 1; transform: none; } }
+    @keyframes photoZoom { from { transform: scale(1.1); } to { transform: scale(1); } }
+    .reveal-copy .name-reveal { font-size: clamp(2rem, min(11vw, 6vh), 5rem); }
+    .reveal-copy .track { font-size: clamp(1rem, min(4.2vw, 3.6vh), 2.2rem); }
+    @media (max-height: 700px) and (max-aspect-ratio: 5/4) {
+      .reveal-grid .portrait { height: min(23vh, 60vw); }
+      .reveal-copy .name-reveal { font-size: clamp(1.7rem, min(10vw, 6.4vh), 4rem); }
+      .reveal-copy .rule { margin: 8px auto; }
+      .reveal-copy .big.mid { margin: 4px 0 0; }
+    }
+    @media (min-aspect-ratio: 5/4) {
+      .reveal-grid { grid-template-columns: auto minmax(0, 660px); gap: 3.5vw; }
+      .reveal-grid .portrait { height: min(62vh, 540px); }
+      .reveal-copy { text-align: left; }
+      .reveal-copy .rule { margin-left: 0; }
+      .reveal-copy .name-reveal { font-size: clamp(2.2rem, min(6.6vw, 11vh), 5.6rem); padding-left: 0; }
+      .reveal-copy .track { font-size: clamp(1.1rem, min(3vw, 5vh), 2.4rem); }
+    }
+
+    /* en la portada: foto junto al texto */
+    .hero-inner.split { max-width: 1120px; width: 100%; display: grid; gap: clamp(26px, 5vw, 64px); justify-items: center; align-items: center; }
+    .hero-photo { width: min(72vw, 340px); cursor: zoom-in; }
+    @media (min-width: 900px), (min-width: 600px) and (orientation: landscape) {
+      .hero-inner.split { grid-template-columns: minmax(200px, 420px) 1fr; text-align: left; justify-items: stretch; }
+      .hero-photo { width: 100%; }
+      .hero-text .hero-cap { margin: 0 0 6px; }
+      .hero-text .name-reveal { padding-left: 0; }
+      .hero-text p.lead { margin-left: 0; }
+      .hero-text .actions { justify-content: flex-start; }
+    }
     .hero .name-reveal { margin: 6px 0; }
     .hero p.lead {
       font-family: "Cormorant Garamond", serif; font-size: clamp(1.2rem, 3vw, 1.55rem);
@@ -709,12 +775,17 @@
     <!-- Escena 5 : revelación del nombre -->
     <div class="scene" data-duration="8800" data-cue="reveal" data-flash data-lights data-fireworks data-confetti data-caps>
       <div class="rays"></div>
-      <div class="shot">
-        <p class="track gold-text">¡Felicitaciones!</p>
-        <div class="name-reveal gold-text write" data-name>Nombre del Graduado</div>
-        <div class="rule"></div>
-        <p class="serif-line anim d4">Graduado del Diplomado en</p>
-        <p class="big mid anim d5">Conciliación Extrajudicial en Derecho</p>
+      <div class="shot reveal-grid">
+        <figure class="portrait">
+          <div class="ph"><img src="graduado.jpg" alt="Oscar Augusto García Ríos con toga, birrete y estola, sosteniendo su diploma"></div>
+        </figure>
+        <div class="reveal-copy">
+          <p class="track gold-text">¡Felicitaciones!</p>
+          <div class="name-reveal gold-text write" data-name>Nombre del Graduado</div>
+          <div class="rule"></div>
+          <p class="serif-line anim d4">Graduado del Diplomado en</p>
+          <p class="big mid anim d5">Conciliación Extrajudicial en Derecho</p>
+        </div>
       </div>
     </div>
 
@@ -788,7 +859,11 @@
   <header class="hero">
     <div class="rays"></div>
     <div class="frame"></div>
-    <div class="hero-inner">
+    <div class="hero-inner split">
+      <figure class="portrait hero-photo reveal" id="heroPhoto">
+        <div class="ph"><img src="graduado.jpg" alt="Oscar Augusto García Ríos con toga, birrete y estola, sosteniendo su diploma"></div>
+      </figure>
+      <div class="hero-text">
       <p class="kicker reveal">Centro de Conciliación y Arbitraje · Corporación PESV</p>
       <svg class="hero-cap reveal" viewBox="60 30 180 125" aria-hidden="true">
         <path d="M110 76 L110 98 Q150 114 190 98 L190 76 Q150 92 110 76 Z" fill="#0b0f1d" stroke="#d4ae5a" stroke-width="1.2"/>
@@ -807,6 +882,7 @@
       <div class="actions reveal">
         <a class="btn" href="#diploma">Ver diploma</a>
         <button class="btn ghost" id="btnReplay" type="button">▶ Ver presentación de nuevo</button>
+      </div>
       </div>
     </div>
     <div class="scroll-cue" aria-hidden="true"></div>
@@ -1782,6 +1858,10 @@
       lightbox.classList.add("open");
     });
     lightbox.addEventListener("click", () => lightbox.classList.remove("open"));
+    document.getElementById("heroPhoto").addEventListener("click", e => {
+      lightbox.querySelector("img").src = e.currentTarget.querySelector("img").src;
+      lightbox.classList.add("open");
+    });
 
     // =========================================================
     // ANIMACIONES AL HACER SCROLL
