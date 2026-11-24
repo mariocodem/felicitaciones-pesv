@@ -4,27 +4,39 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-A single-page congratulations site for a graduate of the *Diplomado en Conciliación Extrajudicial en Derecho* (Centro de Conciliación y Arbitraje Corporación PESV). All UI text is in Spanish. Everything — HTML, CSS and JS — lives in `index.html`; there is no build step, package manager, linter or test suite. Assets sit next to it: `graduada.jpg` (portrait) and `diploma.jpg`.
+A single-page congratulations site for a graduate of the *Diplomado en Conciliación Extrajudicial en Derecho* (Centro de Conciliación y Arbitraje Corporación PESV). All UI text is in Spanish. Plain static files, no build step, package manager, linter or test suite:
 
-Published on GitHub Pages from `main` (`origin` = `mariocodem/felicitaciones-pesv`), served at `https://mariocodem.github.io/felicitaciones-pesv/`. To preview locally, run any static server in the repo root, e.g. `python3 -m http.server`.
+```
+index.html        markup + the GRADUADO data block at the top of <head>
+css/estilos.css   all styles
+js/*.js           classic scripts, loaded in this order at the end of <body>
+img/foto.jpg      portrait, 4:5 (720×900)
+img/diploma.jpg   diploma
+```
+
+Published on GitHub Pages from `main` (`origin` = `mariocodem/felicitaciones-pesv`), served at `https://mariocodem.github.io/felicitaciones-pesv/`. To preview locally, run any static server in the repo root, e.g. `python3 -m http.server` (opening the file directly also works).
 
 ## Changing the graduate
 
-The page is reused for different graduates. A swap touches more than the name constant:
+The page is reused for different graduates. A swap is:
 
-- `NOMBRE_POR_DEFECTO` in the config block at the top of the `<script>` (the name can also be overridden with `?nombre=...` in the URL; it fills every `[data-name]` element and `document.title`).
-- Hard-coded copies of the name: `og:title`, the portrait `alt` texts (intro reveal scene and hero) and the diploma `alt`.
-- Image files: portrait `src` (two places), the `<link rel="preload">`, `og:image` plus its `og:image:width`/`height`, and the diploma `src`. The portrait frame is 4:5 with `object-fit: cover`, so crop wide photos to a vertical upper-body shot (ffmpeg is available; ImageMagick/PIL are not).
-- Grammatical gender throughout the copy (graduado/graduada, conciliador/conciliadora, listo/lista, the stole text `RIGHT` in the `Stole` module and its canvas `aria-label`, the seeded message in `iniciales`).
-- The message wall's `localStorage` key (`KEY` in the MENSAJES block) — change it per graduate so earlier visitors don't see the previous graduate's messages.
+1. `GRADUADO = { nombre, genero }` at the top of `index.html`. `genero` is `"masculino"` or `"femenino"` and drives every gendered word: HTML marks them as `<span data-g="masc|fem">`, JS uses `segunGenero(masc, fem)` (stole text, alt texts, seeded wall message). New gendered copy must use one of these, never hard-coded forms.
+2. The same name in `og:title`, just below it. Link-preview crawlers don't run JS, so it can't come from `GRADUADO`; `js/textos.js` logs a console warning if they don't match.
+3. Replace `img/foto.jpg` and `img/diploma.jpg`, keeping the file names. The portrait frame is 4:5 with `object-fit: cover`: crop wide photos to a vertical shot from the cap to just below the stole (ffmpeg is available; ImageMagick/PIL are not), ideally 720×900 so `og:image:width`/`height` stay right.
 
-## Architecture of `index.html`
+Everything else follows automatically: `[data-name]` elements, `document.title`, alt texts, the stole's embroidered text and `aria-label`, and the message wall's `localStorage` key (derived from the name, so each graduate gets an empty wall). The name can also be overridden per link with `?nombre=...`.
 
-- **Intro "film"**: `#film` contains `.scene` divs played in order. Each scene declares its timing and effects via data attributes: `data-duration` (ms), `data-cue` (music cue name passed to `Sound.cue`), and flags `data-lights`, `data-flash`, `data-fireworks`, `data-confetti`, `data-caps`. `showScene()` in the "INTRO TIPO VIDEO" block reads these; adding a scene means adding markup with these attributes and, if needed, a matching cue in `Sound`.
-- **`Sound`**: ceremonial music synthesized with Web Audio (no audio files). Notes are scheduled shortly before they play rather than all at scene start, for performance.
-- **`Stole`**: a cloth-physics simulation drawn on a `<canvas>` that falls and drapes around the investiture text, with embroidered letters (`LEFT`/`RIGHT`) that follow the cloth and auto-shrink to fit. It has been tuned for performance (no blur/filters, adaptive canvas resolution, `Math.sqrt` over `Math.hypot`) — keep it that way when editing.
-- After the intro: hero (portrait + name), diploma section (with a file-input placeholder if the image is missing, and a lightbox), timeline, values, quote, and a message wall stored only in the visitor's browser.
-- Respects `prefers-reduced-motion` (`reduceMotion` flag and a CSS media block).
+## Architecture
+
+Scripts share globals (classic scripts, not modules), so load order matters:
+
+- **`js/textos.js`**: applies `GRADUADO` to the page; defines `nombre` and `segunGenero()`.
+- **`js/musica.js`** — **`Sound`**: ceremonial music synthesized with Web Audio (no audio files). Notes are scheduled shortly before they play rather than all at scene start, for performance.
+- **`js/efectos.js`**: confetti, fireworks, flying caps (`launchConfetti`, `launchFireworks`, `launchCaps`, `burst`) and the `reduceMotion` flag.
+- **`js/intro.js`** — intro "film": `#film` contains `.scene` divs played in order. Each scene declares its timing and effects via data attributes: `data-duration` (ms), `data-cue` (music cue name passed to `Sound.cue`), and flags `data-lights`, `data-flash`, `data-fireworks`, `data-confetti`, `data-caps`. `showScene()` reads these; adding a scene means adding markup with these attributes and, if needed, a matching cue in `Sound`. Also the gold dust background, the player controls and the seal impact.
+- **`js/estola.js`** — **`Stole`**: a cloth-physics simulation drawn on a `<canvas>` that falls and drapes around the investiture text, with embroidered letters (`LEFT`/`RIGHT`) that follow the cloth and auto-shrink to fit. It has been tuned for performance (no blur/filters, adaptive canvas resolution, `Math.sqrt` over `Math.hypot`) — keep it that way when editing. Inside it `g` is the canvas context, which is why the gender helper isn't called `g`.
+- **`js/pagina.js`**: after the intro: diploma (with a file-input placeholder if the image is missing), lightbox for diploma and portrait, scroll reveals, and the message wall stored only in the visitor's browser.
+- Respects `prefers-reduced-motion` (`reduceMotion` skips the intro and effects; a CSS media block disables animations).
 
 ## Conventions
 
