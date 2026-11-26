@@ -43,6 +43,7 @@
 </head>
 <body class="locked">
   <canvas id="confetti"></canvas>
+  <audio id="musica" src="music/cancion.mp3" preload="auto"></audio>
 
   <!-- Sello reutilizable (intro y diploma) -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -74,7 +75,7 @@
     <div class="progress" id="progress"></div>
 
     <!-- Escena 1 : apertura -->
-    <div class="scene" data-duration="7500" data-cue="open">
+    <div class="scene" data-duration="7500">
       <div class="shot">
         <svg class="emblem anim d1" viewBox="0 0 120 120" aria-hidden="true">
           <circle class="ring" cx="60" cy="60" r="56" fill="none" stroke="#d4ae5a" stroke-width="1.5"/>
@@ -97,7 +98,7 @@
     </div>
 
     <!-- Escena 2 -->
-    <div class="scene" data-duration="5600" data-cue="reflect">
+    <div class="scene" data-duration="5600">
       <div class="shot">
         <p class="serif-line anim">Detrás de cada acuerdo hay alguien que eligió</p>
         <p class="big anim d1" style="margin-top:10px">escuchar, mediar</p>
@@ -106,7 +107,7 @@
     </div>
 
     <!-- Escena 3 -->
-    <div class="scene" data-duration="6400" data-cue="build">
+    <div class="scene" data-duration="6400">
       <div class="shot">
         <div class="chapters">
           <span class="anim"><b>I</b>Formación</span>
@@ -121,7 +122,7 @@
     </div>
 
     <!-- Escena 4 : redoble -->
-    <div class="scene" data-duration="3900" data-cue="roll" data-lights>
+    <div class="scene" data-duration="3900" data-lights>
       <div class="shot">
         <p class="serif-line anim">Con honor y distinción,</p>
         <p class="big mid anim d1">se otorga el título de<br><span class="gold-text"><span data-g="Conciliador|Conciliadora"></span> Extrajudicial en Derecho</span> a…</p>
@@ -129,7 +130,7 @@
     </div>
 
     <!-- Escena 5 : revelación del nombre -->
-    <div class="scene" data-duration="8800" data-cue="reveal" data-flash data-lights data-fireworks data-confetti data-caps>
+    <div class="scene" data-duration="8800" data-flash data-lights data-fireworks data-confetti data-caps>
       <div class="rays"></div>
       <div class="shot reveal-grid">
         <figure class="portrait">
@@ -146,7 +147,7 @@
     </div>
 
     <!-- Escena 6 : investidura -->
-    <div class="scene" data-duration="8600" data-cue="invest">
+    <div class="scene" data-duration="8600">
       <div class="shot invest">
         <canvas class="stole-canvas"></canvas>
         <div class="copy">
@@ -159,7 +160,7 @@
     </div>
 
     <!-- Escena 7 : sello -->
-    <div class="scene" data-duration="7000" data-cue="seal">
+    <div class="scene" data-duration="7000">
       <div class="shot"><div class="shaker">
         <div class="stamp-wrap">
           <span class="shock"></span><span class="shock s2"></span>
@@ -369,7 +370,7 @@
 
   <!-- Código, en orden de carga (comparten variables globales: no cambies el orden) -->
   <script src="js/textos.js"></script>   <!-- aplica GRADUADO: nombre, género, textos alternativos -->
-  <script src="js/musica.js"></script>   <!-- música ceremonial sintetizada (Sound) -->
+  <script src="js/musica.js"></script>   <!-- música de la intro: music/cancion.mp3 (Sound) -->
   <script src="js/efectos.js"></script>  <!-- confeti, fuegos artificiales y birretes -->
   <script src="js/intro.js"></script>    <!-- la película de introducción y sus controles -->
   <script src="js/estola.js"></script>   <!-- estola con física de tela (Stole) -->

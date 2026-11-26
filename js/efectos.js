@@ -38,7 +38,7 @@ function burst(x, y, n = 90, color = pick(fwColors)) {
       life: 1, decay: .011 + Math.random() * .012, color: Math.random() < .2 ? "#fff" : color
     });
   }
-  Sound.pop(); kick();
+  kick();
 }
 function launchFireworks(n = 5, span = 3000) {
   if (reduceMotion) return;

@@ -2,8 +2,9 @@
 // INTRO TIPO VIDEO
 // Cada .scene de #film en index.html se reproduce en orden y declara:
 //   data-duration="7500"  duración en ms
-//   data-cue="open"       pieza musical (ver cues en musica.js)
 //   data-lights, data-flash, data-fireworks, data-confetti, data-caps  efectos
+// La música (musica.js) sigue el reloj de la película: cambiar duraciones
+// mueve el punto en que la canción coincide con la revelación.
 // =========================================================
 const film = document.getElementById("film");
 const scenes = [...film.querySelectorAll(".scene")];
@@ -12,6 +13,8 @@ const btnPause = document.getElementById("btnPause");
 const btnMute = document.getElementById("btnMute");
 scenes.forEach(() => progress.insertAdjacentHTML("beforeend", "<span><i></i></span>"));
 const bars = [...progress.querySelectorAll("i")];
+// segundo de la película en que empieza cada escena
+const sceneStart = scenes.map((_, i) => scenes.slice(0, i).reduce((t, s) => t + +s.dataset.duration, 0) / 1000);
 
 let idx = -1, elapsed = 0, last = 0, paused = false, rafId = null;
 
@@ -32,7 +35,7 @@ function showScene(i) {
   film.classList.toggle("lights", s.hasAttribute("data-lights"));
   if (i > 0) replay(document.getElementById("streak"), "go");
   if (s.hasAttribute("data-flash")) replay(document.getElementById("flash"), "go");
-  Sound.cue(s.dataset.cue);
+  Sound.sync(sceneStart[i]);
   if (s.hasAttribute("data-fireworks")) launchFireworks(8, 5500);
   if (s.hasAttribute("data-confetti")) setTimeout(() => launchConfetti(260), 1900);
   if (s.hasAttribute("data-caps")) setTimeout(() => launchCaps(16), 2600);
@@ -68,13 +71,12 @@ function dustTick() {
 }
 addEventListener("resize", initDust);
 
-// cuando el sello toca la pantalla: temblor, chispas y acorde final
+// cuando el sello toca la pantalla: temblor y chispas
 film.querySelector(".stamp").addEventListener("animationend", e => {
   if (e.animationName !== "stamp") return;
   replay(film.querySelector(".shaker"), "shake");
   const r = e.target.getBoundingClientRect();
   burst(r.left + r.width / 2, r.top + r.height / 2, 120, "#f3dc9b");
-  Sound.impact();
 });
 
 function filmTick(now) {
