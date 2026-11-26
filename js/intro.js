@@ -3,8 +3,6 @@
 // Cada .scene de #film en index.html se reproduce en orden y declara:
 //   data-duration="7500"  duración en ms
 //   data-lights, data-flash, data-fireworks, data-confetti, data-caps  efectos
-// La música (musica.js) sigue el reloj de la película: cambiar duraciones
-// mueve el punto en que la canción coincide con la revelación.
 // =========================================================
 const film = document.getElementById("film");
 const scenes = [...film.querySelectorAll(".scene")];
@@ -13,8 +11,6 @@ const btnPause = document.getElementById("btnPause");
 const btnMute = document.getElementById("btnMute");
 scenes.forEach(() => progress.insertAdjacentHTML("beforeend", "<span><i></i></span>"));
 const bars = [...progress.querySelectorAll("i")];
-// segundo de la película en que empieza cada escena
-const sceneStart = scenes.map((_, i) => scenes.slice(0, i).reduce((t, s) => t + +s.dataset.duration, 0) / 1000);
 
 let idx = -1, elapsed = 0, last = 0, paused = false, rafId = null;
 
@@ -35,7 +31,6 @@ function showScene(i) {
   film.classList.toggle("lights", s.hasAttribute("data-lights"));
   if (i > 0) replay(document.getElementById("streak"), "go");
   if (s.hasAttribute("data-flash")) replay(document.getElementById("flash"), "go");
-  Sound.sync(sceneStart[i]);
   if (s.hasAttribute("data-fireworks")) launchFireworks(8, 5500);
   if (s.hasAttribute("data-confetti")) setTimeout(() => launchConfetti(260), 1900);
   if (s.hasAttribute("data-caps")) setTimeout(() => launchCaps(16), 2600);

@@ -15,7 +15,7 @@ img/diploma.jpg   diploma
 music/cancion.mp3 intro soundtrack
 ```
 
-Published on GitHub Pages from `main` (`origin` = `mariocodem/felicitaciones-pesv`), served at `https://mariocodem.github.io/felicitaciones-pesv/`. To preview locally, run any static server in the repo root, e.g. `python3 -m http.server` (opening the file directly also works).
+Published on GitHub Pages from `main`, folder `/ (root)` (`origin` = `mariocodem/felicitaciones-pesv`), served at `https://mariocodem.github.io/felicitaciones-pesv/`. Pages serves everything with `cache-control: max-age=600`, so every `css/`, `js/` and `music/` URL in `index.html` carries `?v=N`: bump N in all of them whenever a commit changes those files, or returning visitors can get the new HTML with stale scripts (this once left the intro silent). After pushing, check the deploy with `gh run list` and the live files with `curl`. To preview locally, run any static server in the repo root, e.g. `python3 -m http.server` (opening the file directly also works).
 
 ## Changing the graduate
 
@@ -32,7 +32,7 @@ Everything else follows automatically: `[data-name]` elements, `document.title`,
 Scripts share globals (classic scripts, not modules), so load order matters:
 
 - **`js/textos.js`**: applies `GRADUADO` to the page; defines `nombre` and `segunGenero()`.
-- **`js/musica.js`** — **`Sound`**: plays `music/cancion.mp3` (the `<audio id="musica">` element) during the intro, fading in on start and out at the end; follows the film's pause and mute. `INICIO` is the song second the intro starts at, chosen so the song's big entry (56.1 s) lands on the name reveal (scene 5, 23.4 s into the film). `showScene()` calls `Sound.sync()` with each scene's start time, which reseeks if the song drifted more than 0.35 s (slow load, skipping scenes). Changing scene durations moves that alignment; swapping the song means re-picking `INICIO`. There are no other sound effects.
+- **`js/musica.js`** — **`Sound`**: plays `music/cancion.mp3` (the `<audio id="musica">` element) from the start of the song (`INICIO = 0`, the user's choice) straight through the intro, fading out at the end; follows the film's pause and mute. `play()` must stay inside the click's call stack (autoplay rules) and nothing before it may throw (seeks are wrapped in `try` for Safari). Load/playback failures are logged with `console.warn`. There are no other sound effects.
 - **`js/efectos.js`**: confetti, fireworks, flying caps (`launchConfetti`, `launchFireworks`, `launchCaps`, `burst`) and the `reduceMotion` flag.
 - **`js/intro.js`** — intro "film": `#film` contains `.scene` divs played in order. Each scene declares its timing and effects via data attributes: `data-duration` (ms) and flags `data-lights`, `data-flash`, `data-fireworks`, `data-confetti`, `data-caps`. `showScene()` reads these; adding a scene means adding markup with these attributes. Also the gold dust background, the player controls and the seal impact.
 - **`js/estola.js`** — **`Stole`**: a cloth-physics simulation drawn on a `<canvas>` that falls and drapes around the investiture text, with embroidered letters (`LEFT`/`RIGHT`) that follow the cloth and auto-shrink to fit. It has been tuned for performance (no blur/filters, adaptive canvas resolution, `Math.sqrt` over `Math.hypot`) — keep it that way when editing. Inside it `g` is the canvas context, which is why the gender helper isn't called `g`.
