@@ -14,6 +14,9 @@
        3. Las fotos, con estos mismos nombres de archivo:
             img/foto.jpg     retrato vertical 4:5 (720 × 900)
             img/diploma.jpg  diploma
+       4. Vuelve a grabar el video de la presentación (lleva el nombre
+          y la foto):  node herramientas/grabar-video.mjs
+       5. Sube el número ?v= de los enlaces (ver al final de la página).
        ========================================================= -->
   <script>
     const GRADUADO = {
@@ -39,11 +42,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Great+Vibes&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/estilos.css?v=2">
+  <link rel="stylesheet" href="css/estilos.css?v=3">
 </head>
 <body class="locked">
   <canvas id="confetti"></canvas>
-  <audio id="musica" src="music/cancion.mp3?v=2" preload="auto"></audio>
+  <audio id="musica" src="music/cancion.mp3?v=3" preload="auto"></audio>
 
   <!-- Sello reutilizable (intro y diploma) -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -285,6 +288,43 @@
   </section>
 
   <!-- =========================================================
+       RECUERDOS PARA DESCARGAR
+       (el video se graba con: node herramientas/grabar-video.mjs)
+       ========================================================= -->
+  <section id="recuerdos" style="padding-top:20px">
+    <div class="wrap">
+      <div class="head reveal">
+        <span class="kicker">Para guardar</span>
+        <h2>Un recuerdo de este día</h2>
+        <p>Descarga la presentación, el diploma y la foto para conservarlos o compartirlos.</p>
+      </div>
+      <div class="keepsakes reveal">
+        <a class="keepsake" href="video/presentacion.mp4?v=3" data-descarga="Presentación de grado">
+          <span class="thumb video"><img src="video/portada.jpg?v=3" alt="" loading="lazy"></span>
+          <span class="row">
+            <span class="info"><strong>Presentación en video</strong><small>MP4<span data-peso></span></small></span>
+            <span class="get"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Descargar</span>
+          </span>
+        </a>
+        <a class="keepsake" href="img/diploma.jpg" data-descarga="Diploma">
+          <span class="thumb"><img src="img/diploma.jpg" alt="" loading="lazy"></span>
+          <span class="row">
+            <span class="info"><strong>Diploma</strong><small>JPG<span data-peso></span></small></span>
+            <span class="get"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Descargar</span>
+          </span>
+        </a>
+        <a class="keepsake" href="img/foto.jpg" data-descarga="Foto de grado">
+          <span class="thumb foto"><img src="img/foto.jpg" alt="" loading="lazy"></span>
+          <span class="row">
+            <span class="info"><strong>Foto de grado</strong><small>JPG<span data-peso></span></small></span>
+            <span class="get"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Descargar</span>
+          </span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
        RECORRIDO
        ========================================================= -->
   <section>
@@ -369,13 +409,13 @@
   <div class="lightbox" id="lightbox"><img alt=""></div>
 
   <!-- Código, en orden de carga (comparten variables globales: no cambies el orden).
-       ?v=2: al publicar cambios en css/, js/ o music/, sube el número en todos los
+       ?v=3: al publicar cambios en css/, js/, music/ o video/, sube el número en todos los
        enlaces (también estilos.css y la canción) para que nadie mezcle archivos viejos y nuevos. -->
-  <script src="js/textos.js?v=2"></script>   <!-- aplica GRADUADO: nombre, género, textos alternativos -->
-  <script src="js/musica.js?v=2"></script>   <!-- música de la intro: music/cancion.mp3 (Sound) -->
-  <script src="js/efectos.js?v=2"></script>  <!-- confeti, fuegos artificiales y birretes -->
-  <script src="js/intro.js?v=2"></script>    <!-- la película de introducción y sus controles -->
-  <script src="js/estola.js?v=2"></script>   <!-- estola con física de tela (Stole) -->
-  <script src="js/pagina.js?v=2"></script>   <!-- diploma, ampliación, animaciones al hacer scroll y mensajes -->
+  <script src="js/textos.js?v=3"></script>   <!-- aplica GRADUADO: nombre, género, textos alternativos -->
+  <script src="js/musica.js?v=3"></script>   <!-- música de la intro: music/cancion.mp3 (Sound) -->
+  <script src="js/efectos.js?v=3"></script>  <!-- confeti, fuegos artificiales y birretes -->
+  <script src="js/intro.js?v=3"></script>    <!-- la película de introducción y sus controles -->
+  <script src="js/estola.js?v=3"></script>   <!-- estola con física de tela (Stole) -->
+  <script src="js/pagina.js?v=3"></script>   <!-- diploma, ampliación, animaciones al hacer scroll y mensajes -->
 </body>
 </html>

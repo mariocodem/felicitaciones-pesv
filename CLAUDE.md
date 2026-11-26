@@ -13,9 +13,11 @@ js/*.js           classic scripts, loaded in this order at the end of <body>
 img/foto.jpg      portrait, 4:5 (720×900)
 img/diploma.jpg   diploma
 music/cancion.mp3 intro soundtrack
+video/            recorded intro (presentacion.mp4) + its thumbnail (portada.jpg), offered as downloads
+herramientas/     grabar-video.mjs, the recorder that produces video/
 ```
 
-Published on GitHub Pages from `main`, folder `/ (root)` (`origin` = `mariocodem/felicitaciones-pesv`), served at `https://mariocodem.github.io/felicitaciones-pesv/`. Pages serves everything with `cache-control: max-age=600`, so every `css/`, `js/` and `music/` URL in `index.html` carries `?v=N`: bump N in all of them whenever a commit changes those files, or returning visitors can get the new HTML with stale scripts (this once left the intro silent). After pushing, check the deploy with `gh run list` and the live files with `curl`. To preview locally, run any static server in the repo root, e.g. `python3 -m http.server` (opening the file directly also works).
+Published on GitHub Pages from `main`, folder `/ (root)` (`origin` = `mariocodem/felicitaciones-pesv`), served at `https://mariocodem.github.io/felicitaciones-pesv/`. Pages serves everything with `cache-control: max-age=600`, so every `css/`, `js/`, `music/` and `video/` URL in `index.html` carries `?v=N`: bump N in all of them whenever a commit changes those files, or returning visitors can get the new HTML with stale scripts (this once left the intro silent). After pushing, check the deploy with `gh run list` and the live files with `curl`. To preview locally, run any static server in the repo root, e.g. `python3 -m http.server` (opening the file directly also works).
 
 ## Changing the graduate
 
@@ -24,6 +26,7 @@ The page is reused for different graduates. A swap is:
 1. `GRADUADO = { nombre, genero }` at the top of `index.html`. `genero` is `"masculino"` or `"femenino"` and drives every gendered word: HTML marks them as `<span data-g="masc|fem">`, JS uses `segunGenero(masc, fem)` (stole text, alt texts, seeded wall message). New gendered copy must use one of these, never hard-coded forms.
 2. The same name in `og:title`, just below it. Link-preview crawlers don't run JS, so it can't come from `GRADUADO`; `js/textos.js` logs a console warning if they don't match.
 3. Replace `img/foto.jpg` and `img/diploma.jpg`, keeping the file names. The portrait frame is 4:5 with `object-fit: cover`: crop wide photos to a vertical shot from the cap to just below the stole (ffmpeg is available; ImageMagick/PIL are not), ideally 720×900 so `og:image:width`/`height` stay right.
+4. Re-record the downloadable video, which has the name and photo baked in: `node herramientas/grabar-video.mjs` (Node 22+, Firefox, ffmpeg; a few minutes). Then bump `?v=`.
 
 Everything else follows automatically: `[data-name]` elements, `document.title`, alt texts, the stole's embroidered text and `aria-label`, and the message wall's `localStorage` key (derived from the name, so each graduate gets an empty wall). The name can also be overridden per link with `?nombre=...`.
 
@@ -36,7 +39,8 @@ Scripts share globals (classic scripts, not modules), so load order matters:
 - **`js/efectos.js`**: confetti, fireworks, flying caps (`launchConfetti`, `launchFireworks`, `launchCaps`, `burst`) and the `reduceMotion` flag.
 - **`js/intro.js`** — intro "film": `#film` contains `.scene` divs played in order. Each scene declares its timing and effects via data attributes: `data-duration` (ms) and flags `data-lights`, `data-flash`, `data-fireworks`, `data-confetti`, `data-caps`. `showScene()` reads these; adding a scene means adding markup with these attributes. Also the gold dust background, the player controls and the seal impact.
 - **`js/estola.js`** — **`Stole`**: a cloth-physics simulation drawn on a `<canvas>` that falls and drapes around the investiture text, with embroidered letters (`LEFT`/`RIGHT`) that follow the cloth and auto-shrink to fit. It has been tuned for performance (no blur/filters, adaptive canvas resolution, `Math.sqrt` over `Math.hypot`) — keep it that way when editing. Inside it `g` is the canvas context, which is why the gender helper isn't called `g`.
-- **`js/pagina.js`**: after the intro: diploma (with a file-input placeholder if the image is missing), lightbox for diploma and portrait, scroll reveals, and the message wall stored only in the visitor's browser.
+- **`js/pagina.js`**: after the intro: diploma (with a file-input placeholder if the image is missing), lightbox for diploma and portrait, the `#recuerdos` download cards (`[data-descarga]` links get a `download` file name with the graduate's name and a size from a `HEAD` request; a card whose file is missing hides itself), scroll reveals, and the message wall stored only in the visitor's browser.
+- **`herramientas/grabar-video.mjs`**: serves the repo locally, drives headless Firefox over WebDriver BiDi with a preload script that replaces the clock (timers, `requestAnimationFrame`, `performance.now`, and every CSS animation via `document.getAnimations()`), steps the film at 60 fps, screenshots every other step at 1280×720 and pipes the PNGs to ffmpeg with the song (from the same `INICIO` as `musica.js`) and a fade to black. Controls and progress bars are hidden in the recording. Anything new in the intro that keeps time some other way (e.g. `requestIdleCallback`, `<video>`) won't be frame-stepped.
 - Respects `prefers-reduced-motion` (`reduceMotion` skips the intro and effects; a CSS media block disables animations).
 
 ## Conventions

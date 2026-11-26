@@ -28,6 +28,19 @@ document.getElementById("heroPhoto").addEventListener("click", e => ampliar(e.cu
 lightbox.addEventListener("click", () => lightbox.classList.remove("open"));
 
 // =========================================================
+// RECUERDOS: nombre del archivo al descargar y su peso
+// =========================================================
+document.querySelectorAll("[data-descarga]").forEach(a => {
+  a.download = `${a.dataset.descarga} - ${nombre}.${a.pathname.split(".").pop()}`;
+  fetch(a.href, { method: "HEAD" }).then(r => {
+    if (!r.ok) { a.hidden = true; return; }   // si falta el archivo (p. ej. el video sin grabar), no se ofrece
+    const b = +r.headers.get("content-length");
+    if (b) a.querySelector("[data-peso]").textContent =
+      " · " + (b < 1048576 ? Math.round(b / 1024) + " KB" : (b / 1048576).toFixed(1).replace(".", ",") + " MB");
+  }).catch(() => {});
+});
+
+// =========================================================
 // ANIMACIONES AL HACER SCROLL
 // =========================================================
 const io = new IntersectionObserver(entries => {
