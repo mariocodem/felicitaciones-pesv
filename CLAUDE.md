@@ -12,6 +12,7 @@ css/estilos.css   all styles
 js/*.js           classic scripts, loaded in this order at the end of <body>
 img/foto.jpg      portrait, 4:5 (720×900)
 img/diploma.jpg   diploma
+img/*-hd.jpg      the same two at 2× (1440×1800, 3200 wide): what the download cards link to
 music/cancion.mp3 intro soundtrack
 video/            recorded intro (presentacion.mp4) + its thumbnail (portada.jpg), offered as downloads
 herramientas/     grabar-video.mjs, the recorder that produces video/
@@ -26,6 +27,7 @@ The page is reused for different graduates. A swap is:
 1. `GRADUADO = { nombre, genero }` at the top of `index.html`. `genero` is `"masculino"` or `"femenino"` and drives every gendered word: HTML marks them as `<span data-g="masc|fem">`, JS uses `segunGenero(masc, fem)` (stole text, alt texts, seeded wall message). New gendered copy must use one of these, never hard-coded forms.
 2. The same name in `og:title`, just below it. Link-preview crawlers don't run JS, so it can't come from `GRADUADO`; `js/textos.js` logs a console warning if they don't match.
 3. Replace `img/foto.jpg` and `img/diploma.jpg`, keeping the file names. The portrait frame is 4:5 with `object-fit: cover`: crop wide photos to a vertical shot from the cap to just below the stole (ffmpeg is available; ImageMagick/PIL are not), ideally 720×900 so `og:image:width`/`height` stay right.
+   Then make the 2× download copies from the same sources: `img/foto-hd.jpg` (same crop, 1440×1800) and `img/diploma-hd.jpg` (`scale=3200:-1:flags=lanczos`, `-q:v 2`).
 4. Re-record the downloadable video, which has the name and photo baked in: `node herramientas/grabar-video.mjs` (Node 22+, Firefox, ffmpeg; a few minutes). Then bump `?v=`.
 
 Everything else follows automatically: `[data-name]` elements, `document.title`, alt texts, the stole's embroidered text and `aria-label`, and the message wall's `localStorage` key (derived from the name, so each graduate gets an empty wall). The name can also be overridden per link with `?nombre=...`.
